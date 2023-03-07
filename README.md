@@ -16,30 +16,30 @@ input:
   
   format:
   
-  field boundry (x-axis)
-  field boundry (y-axis)
-  x_start y_start
-  x_end y_end
-  Number of icebergs
-  #1 (iceberg number)
-  1_dots (number of dots in iceberg #1)
-  x_1 y_1
-  x_2 y_2
-  .....
-  #2 (iceberg number)
-  1_dots (number of dots in iceberg #2)
-  x_1 y_1
-  x_2 y_2
-  .....
+  -field boundry (x-axis)
+  -field boundry (y-axis)
+  -x_start y_start
+  -x_end y_end
+  -Number of icebergs
+  -#1 (iceberg number)
+  -1_dots (number of dots in iceberg #1)
+  -x_1 y_1
+  -x_2 y_2
+  -.....
+  -#2 (iceberg number)
+  -1_dots (number of dots in iceberg #2)
+  -x_1 y_1
+  -x_2 y_2
+  -.....
   
   
-  #part 2: read the file in C++
-  
-  #part 3: convex Hull problem
-  
-  #part 4: path planning solution - A*
-  
-  #part 5: Dubbins model
+#part 2: read the file in C++
+
+#part 3: convex Hull problem
+
+#part 4: path planning solution - A*
+
+#part 5: Dubbins model
 
   
   
