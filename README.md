@@ -32,11 +32,17 @@
 - x_1 y_1
 - x_2 y_2
 - .....
-  
-  
-## part 2: read the file in C++
 
-## part 3: convex Hull problem
+## part 3: Convex Hull problem (solving  with c++)
+- Read the data_cpp.txt file in C++ and solve the Convex-Hull problem
+- [Convex-Hull](https://en.wikipedia.org/wiki/Convex_hull)
+- Possible solutions:
+  - Divide and Conquer Algorithm - $O(n*log(n))$
+  - Jarvis’ Algorithm -  $O(n^2)$
+  - Graham Scan Algorithm - $O(n*log(n))$
+  - $\sqrt{3x-1}+(1+x)^2$
+  
+
 
 ## part 4: path planning solution - A*
 
