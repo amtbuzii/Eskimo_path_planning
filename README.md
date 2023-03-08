@@ -3,7 +3,7 @@
 ![img.png](img.png)
 
 ## part 1: A review of algorithms for optimally solving the path planning problem.
--  link
+-  [Algorithms review](https://github.com/amtbuzii/Eskimo_path_planning/blob/main/startup%20mission%20presentaion.pdf)
 
 
 ## part 2: Create text file with parameters needed to the algorithm
