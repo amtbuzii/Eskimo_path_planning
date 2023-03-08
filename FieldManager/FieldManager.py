@@ -1,6 +1,7 @@
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+import math
 
 
 def write_to_file(lines=''):
@@ -28,6 +29,33 @@ def write_to_file(lines=''):
         print("The data was successfully written to the file.")
 
 
+def random_point(x_center, y_center, radius, dots):
+    """
+    generate random points for each polygon. (using rejection sampling method - 78.5% success)
+
+    :type x_center: int
+    :type y_center: int
+    :type radius: int
+    :type dots: int
+    :rtype: nparray[n, (x,y)]
+    """
+    rnd_points = np.zeros([dots, 2])
+
+    for i in range(dots):
+        while True:
+            x = random.random() * radius * 2 - radius
+            y = random.random() * radius * 2 - radius
+            if x * x + y * y < (radius * radius):  # check correctness of the coordinate
+                rnd_points[i, :] = x_center + x, y_center + y
+                break
+
+    return rnd_points
+
+
+def distance(x1, y1, x2, y2):
+    return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
+
+
 class FieldManager:
     def __init__(self, size=2, start=(0, 0), end=(1, 1), seed=0):
         """
@@ -47,17 +75,15 @@ class FieldManager:
             return
         self._start = start
         self._end = end
-        self._ice_num = random.randint(1, 5)  # max 19 icebergs
+        self._ice_num = random.randint(1, 20)  # max 19 icebergs
+        polygons_text = self._create_polygons()  # write the polygons to string and show them in plot
 
         # write the header text
         start = " ".join([str(_) for _ in self._start])
         end = " ".join([str(_) for _ in self._end])
-
         header_text = f"{self._size}\n{self._size}\n{start}\n{end}\n{self._ice_num}"
 
-        # write the polygons text
-        polygons_text = self._create_polygons()
-
+        # write to file
         write_to_file(lines=header_text + polygons_text)
 
     def _check_input(self, coordinate):
@@ -76,42 +102,33 @@ class FieldManager:
         polygons_text = ''
 
         for counter in range(self._ice_num):
-            temp_x = random.randint(0, self._size)  # random x coordinate
-            temp_y = random.randint(0, self._size)  # random y coordinate
-            temp_radius = random.randint(1, 20)  # random radius
-            temp_n = random.randint(3, 6)  # random number of dots in the iceberg
-            temp_rnd_point = self._random_point(x_center=temp_x, y_center=temp_y, radius=temp_radius, iceberg_num=temp_n)  # random dots coordinate
+            # random center coordinate
+            temp_x = random.randint(0, self._size)
+            temp_y = random.randint(0, self._size)
+
+            # Checking the proper distance between the center point and the start and end points
+            center_start_distance = distance(self._start[0], self._start[1], temp_x, temp_y)
+            center_end_distance = distance(self._end[0], self._end[1], temp_x, temp_y)
+            min_radius = min(30, min(center_start_distance, center_end_distance))
+
+            # random radius
+            temp_radius = random.randint(1, int(min_radius))
+
+            # random number of dots in the iceberg, (min 3)
+            temp_dots = random.randint(3, 10)
+
+            # get random dots using random_point function
+            temp_rnd_point = random_point(x_center=temp_x, y_center=temp_y, radius=temp_radius,
+                                          dots=temp_dots)  # random dots coordinate
 
             # add to polygons text
             points = "\n".join([" ".join(item) for item in temp_rnd_point.astype(str)])
-            polygons_text += f"\n{counter + 1}\n{temp_n}\n{points}"
+            polygons_text += f"\n{counter + 1}\n{temp_dots}\n{points}"
 
             # draw the polygon
-            self._draw_polygon(polygon=temp_rnd_point, counter=counter+1)
+            self._draw_polygon(polygon=temp_rnd_point, counter=counter + 1)
 
         return polygons_text
-
-    def _random_point(self, x_center, y_center, radius, iceberg_num):
-        """
-        generate random points for each polygon. (using rejection sampling method - 78.5% success)
-
-        :type x_center: int
-        :type y_center: int
-        :type radius: int
-        :type iceberg_num: int
-        :rtype: nparray[n, (x,y)]
-        """
-        rnd_points = np.zeros([iceberg_num, 2])
-
-        for i in range(iceberg_num):
-            while True:
-                x = random.random() * radius * 2 - radius
-                y = random.random() * radius * 2 - radius
-                if x * x + y * y < (radius * radius):  # check correctness of the coordinate
-                    rnd_points[i, :] = x_center + x, y_center + y
-                    break
-
-        return rnd_points
 
     @staticmethod
     def _draw_polygon(polygon, counter):
