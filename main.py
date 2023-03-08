@@ -1,5 +1,5 @@
-from Eskimo.Eskimo import Eskimo
+from FieldManager.FieldManager import FieldManager
 
 if __name__ == '__main__':
-    eskimo = Eskimo(300, (10.0, 10.0), (250.0, 250.0))
+    field = FieldManager(300, (10.0, 10.0), (250.0, 250.0), 0)
 

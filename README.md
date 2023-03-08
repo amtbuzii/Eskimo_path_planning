@@ -1,9 +1,9 @@
 # Eskimo path  planning
 ### Goal - 2D problem, finding the best/shortest path (from start to end) with obstacles.
-![img.png](images/img.png)
+![img.png](project_data/img.png)
 
 ## part 1: A review of algorithms for optimally solving the path planning problem.
--  [Algorithms review](https://github.com/amtbuzii/Eskimo_path_planning/blob/main/startup%20mission%20presentaion.pdf)
+-  [Algorithms review](project_data/startup%20mission%20presentaion.pdf)
 
 
 ## part 2: Create text file with parameters needed to the algorithm
@@ -33,7 +33,7 @@
 - x_2 y_2
 - .....
 - **Example**
-![img_2.png](images/img_2.png)
+![img_2.png](project_data/img_2.png)
 
 ## part 3: Convex Hull problem (solving  with c++)
 - Read the data_cpp.txt file in C++ and solve the Convex-Hull problem
@@ -50,7 +50,7 @@
 - ### Divide and Conquer Algorithm
   - **Step 1:**
     - Merge two convex to 1 in linear time
-    ![img_1.png](images/img_1.png)
+    ![img_1.png](project_data/img_1.png)
 
 
 ## part 4: path planning solution - A*
