@@ -40,7 +40,11 @@ class FieldManager:
         :rtype: List[int]
         """
         random.seed(seed)
+
         self._size = size
+        if not self._check_input(start) or not self._check_input(end):
+            print("invalid coordinate")
+            return
         self._start = start
         self._end = end
         self._ice_num = random.randint(1, 5)  # max 19 icebergs
@@ -48,18 +52,25 @@ class FieldManager:
         # write the header text
         start = " ".join([str(_) for _ in self._start])
         end = " ".join([str(_) for _ in self._end])
-        header_text = "%s \n%s \n%s \n%s \n%s" % (self._size, self._size, start, end, self._ice_num)
+
+        header_text = f"{self._size}\n{self._size}\n{start}\n{end}\n{self._ice_num}"
 
         # write the polygons text
-        polygons_text = self._get_random_points()
+        polygons_text = self._create_polygons()
 
         write_to_file(lines=header_text + polygons_text)
 
+    def _check_input(self, coordinate):
+        # check start point
+        x = coordinate[0]
+        y = coordinate[1]
+        if x < 0 or x > self._size or y < 0 or y > self._size:
+            return False
+        return True
 
-
-    def _get_random_points(self):
+    def _create_polygons(self):
         """
-        generate random icebergs (using rejection_sampling function)
+        create random polygons (icebergs)
         :rtype: string
         """
         polygons_text = ''
@@ -67,51 +78,40 @@ class FieldManager:
         for counter in range(self._ice_num):
             temp_x = random.randint(0, self._size)  # random x coordinate
             temp_y = random.randint(0, self._size)  # random y coordinate
-            temp_radios = random.randint(1, 20)  # random radios
+            temp_radius = random.randint(1, 20)  # random radius
             temp_n = random.randint(3, 6)  # random number of dots in the iceberg
-            temp_rnd_point = self._random_point(temp_x, temp_y, temp_radios, temp_n)  # random dots coordinate
+            temp_rnd_point = self._random_point(x_center=temp_x, y_center=temp_y, radius=temp_radius, iceberg_num=temp_n)  # random dots coordinate
 
             # add to polygons text
             points = "\n".join([" ".join(item) for item in temp_rnd_point.astype(str)])
-            polygons_text += "\n%s \n%s \n%s " % (counter+1, temp_n, points)
+            polygons_text += f"\n{counter + 1}\n{temp_n}\n{points}"
 
             # draw the polygon
-            self._draw_polygon(temp_rnd_point, counter+1)
+            self._draw_polygon(polygon=temp_rnd_point, counter=counter+1)
 
         return polygons_text
 
-    def _random_point(self, x_center, y_center, radios, n):
+    def _random_point(self, x_center, y_center, radius, iceberg_num):
         """
-        generate random point for polygon. (using rejection_sampling function)
+        generate random points for each polygon. (using rejection sampling method - 78.5% success)
 
         :type x_center: int
         :type y_center: int
-        :type radios: int
-        :type n: int - number of icebergs
+        :type radius: int
+        :type iceberg_num: int
         :rtype: nparray[n, (x,y)]
         """
-        rnd_points = np.zeros([n, 2])
+        rnd_points = np.zeros([iceberg_num, 2])
 
-        for i in range(n):
-            rnd_points[i, :] = self._rejection_sampling(radios, x_center, y_center)
+        for i in range(iceberg_num):
+            while True:
+                x = random.random() * radius * 2 - radius
+                y = random.random() * radius * 2 - radius
+                if x * x + y * y < (radius * radius):  # check correctness of the coordinate
+                    rnd_points[i, :] = x_center + x, y_center + y
+                    break
 
         return rnd_points
-
-    @staticmethod
-    def _rejection_sampling(radios, x_center, y_center):
-        """
-        randomize point and check if the point inside the radios. (78.5% success)
-
-        :type radios: int
-        :type x_center: int
-        :type y_center: int
-        :rtype: tuple(x,y)
-        """
-        while True:
-            x = random.random() * radios * 2 - radios
-            y = random.random() * radios * 2 - radios
-            if x * x + y * y < (radios * radios):  # check correctness of the coordinate
-                return x_center + x, y_center + y
 
     @staticmethod
     def _draw_polygon(polygon, counter):
