@@ -37,11 +37,18 @@
 - Read the data_cpp.txt file in C++ and solve the Convex-Hull problem
 - [Convex-Hull](https://en.wikipedia.org/wiki/Convex_hull)
 - Possible solutions:
-  - Divide and Conquer Algorithm - $O(n*log(n))$
   - Jarvis’ Algorithm -  $O(n^2)$
-  - Graham Scan Algorithm - $O(n*log(n))$
-  - $\sqrt{3x-1}+(1+x)^2$
-  
+  - Graham Scan Algorithm - $O(nlog(n))$
+  - Quickhull Algorithm - $O(n^2)$
+  - **Divide and Conquer Algorithm - $O(nlog(n))$**
+  - Monotone Chain Algorithm - $O(nlog(n))$
+  - Incremental Algorithm - $O(nlog(n))$
+  - Kirkpatrick–Seidel Algorithm — $O(nlog(n))$
+  - Chan's Algorithm — $O(nlog(n))$
+- ### Divide and Conquer Algorithm
+  - **Step 1:**
+    - Merge two convex to 1 in linear time
+    ![img_1.png](img_1.png)
 
 
 ## part 4: path planning solution - A*
