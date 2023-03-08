@@ -14,7 +14,7 @@
 - random polygons:
   - N - number of icebergs.
   - Dots - number of dots in each iceberg.
-  - R - radios size for each iceberg.
+  - R - radius size for each iceberg.
   
 ### Output: text file
 - field boundry (x-axis)
