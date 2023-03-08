@@ -8,9 +8,9 @@ def write_to_file(lines=''):
     write the data to file.
     :type lines: string
     """
-    print(lines)
+
     try:
-        with open("/data_cpp.txt", "w") as file:
+        with open("../Eskimo_path_planning/data_cpp.txt", "w") as file:
             file.writelines(lines)
     except FileNotFoundError:
         print("Error: The file was not found.")
@@ -40,24 +40,24 @@ class FieldManager:
         :rtype: List[int]
         """
         random.seed(seed)
-
         self._size = size
         self._start = start
         self._end = end
         self._ice_num = random.randint(1, 5)  # max 19 icebergs
 
+        # write the header text
         start = " ".join([str(_) for _ in self._start])
         end = " ".join([str(_) for _ in self._end])
-        # write header to file
         header_text = "%s \n%s \n%s \n%s \n%s" % (self._size, self._size, start, end, self._ice_num)
-        polygons_text = self._get_random_point()
+
+        # write the polygons text
+        polygons_text = self._get_random_points()
 
         write_to_file(lines=header_text + polygons_text)
 
-        # present the all field
-        self._show_field()
 
-    def _get_random_point(self):
+
+    def _get_random_points(self):
         """
         generate random icebergs (using rejection_sampling function)
         :rtype: string
@@ -124,21 +124,27 @@ class FieldManager:
 
         plt.scatter(polygon[:, 0], polygon[:, 1], s=8, label="Polygon" + str(counter))
 
-    def _show_field(self):
+    def show_field(self):
         """
         Show field with start, end points and all polygons.
         """
 
+        # figure title
         plt.figure(1, figsize=(5, 5))
         plt.suptitle("FieldManager field", fontsize=15)
-        plt.title("Number of ices = " + str(self._ice_num), fontsize=8)
+        plt.title("Number of icebergs = " + str(self._ice_num), fontsize=8)
+
+        # plot START + END point
         plt.scatter(self._start[0], self._start[1], color="blue", s=10)
         plt.text(self._start[0] - 8, self._start[1] + 5, "Start")
         plt.scatter(self._end[0], self._end[1], color="red", s=10)
         plt.text(self._end[0] - 8, self._end[1] + 5, "End")
+
+        # grid configurations
         plt.xlim(0, self._size)
         plt.ylim(0, self._size)
         plt.legend(loc="best")
         plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=5)
         plt.grid()
+
         plt.show()
