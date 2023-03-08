@@ -12,10 +12,10 @@ def write_to_file(header=False, lines=''):
 
     try:
         if header:
-            with open("data_cpp.txt", "w") as file:
+            with open("../data_cpp.txt", "w") as file:
                 file.writelines(lines)
         else:
-            with open("data_cpp.txt", "a") as file:
+            with open("../data_cpp.txt", "a") as file:
                 file.writelines(lines)
     except FileNotFoundError:
         print("Error: The file was not found.")
