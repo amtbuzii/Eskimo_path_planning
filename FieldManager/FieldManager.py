@@ -121,6 +121,13 @@ class FieldManager:
             temp_rnd_point = random_point(x_center=temp_x, y_center=temp_y, radius=temp_radius,
                                           dots=temp_dots)  # random dots coordinate
 
+            # checking that all point in the file (0 to size)
+            for dot in temp_rnd_point:
+                dot[0] = min(dot[0], self._size-1)
+                dot[1] = min(dot[1], self._size-1)
+                dot[0] = max(dot[0], 0)
+                dot[1] = max(dot[1], 0)
+
             # add to polygons text
             points = "\n".join([" ".join(item) for item in temp_rnd_point.astype(str)])
             polygons_text += f"\n{counter + 1}\n{temp_dots}\n{points}"
