@@ -3,7 +3,18 @@
 ![img.png](project_data/filed_eskimo.png)
 
 ## part 1: A review of algorithms for optimally solving the path planning problem.
--  [Algorithms review](project_data/startup%20mission%20presentaion.pdf)
+- Grassfire Algorithm
+- Dijkstra's Algorithm
+- A* Algorithm
+- D* Algorithm
+- D* Lite Algorithm
+- Potential Field Algorithm
+- Probabilistic Road Map (PRM) Algorithm
+- Rapidly Exploring Random Trees (RRT) Algorithm
+- RRT* Algorithm
+- LQR-RRT* Algorithm
+-  [Algorithms review](project_data/algo_review.pdf)
+-  [PPT FILE review](project_data/startup%20mission%20presentaion.pptx)
 
 
 ## part 2: Create text file with parameters needed to the algorithm

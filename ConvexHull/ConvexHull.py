@@ -7,10 +7,9 @@ from ConvexHull.Point import Point
 class ConvexHull:
     def __init__(self, points):
         self.points = []
-        for point in points:   # from list of tuple to list op Points
+        for point in points:  # from list of tuple to list op Points
             self.points.append(Point(point[0], point[1]))
         self.hull = self.graham_scan()
-
 
     def graham_scan(self):
         """
@@ -20,7 +19,8 @@ class ConvexHull:
         pivot = min(self.points)
 
         # Sort the points in increasing order of the angle they and the pivot point make with the x-axis
-        sorted_points = sorted(self.points, key=lambda p: (math.atan2(p.y-pivot.y, p.x-pivot.x), (p.x-pivot.x)**2 + (p.y-pivot.y)**2))
+        sorted_points = sorted(self.points, key=lambda p: (
+        math.atan2(p.y - pivot.y, p.x - pivot.x), (p.x - pivot.x) ** 2 + (p.y - pivot.y) ** 2))
 
         # Add the first two sorted points to the convex hull
         hull = [pivot, sorted_points[0]]
@@ -45,7 +45,3 @@ def orientation(p, q, r):
         return 1  # clockwise
     else:
         return 2  # counterclockwise
-
-
-
-
