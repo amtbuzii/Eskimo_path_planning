@@ -5,11 +5,10 @@ from ConvexHull.ConvexHull import ConvexHull
 
 
 def read_field(file_name, convex):
-
     # readfile
     file = open(file_name, 'r')
     size_x = float(file.readline())
-    size_y= float(file.readline())
+    size_y = float(file.readline())
     start = tuple(map(float, file.readline().split(' ')))
     end = tuple(map(float, file.readline().split(' ')))
     ice_num = int(file.readline())
@@ -28,13 +27,12 @@ def read_field(file_name, convex):
     return size_x, size_y, start, end, ice_num
 
 
-
 def show_field(file_name, convex=False):
     """
     Show field with start, end points and all polygons.
     """
 
-    size_x, size_y, start, end, ice_num = read_field(file_name,convex)
+    size_x, size_y, start, end, ice_num = read_field(file_name, convex)
 
     # figure title
     plt.figure(1, figsize=(5, 5))
@@ -68,22 +66,16 @@ def draw_polygon(polygon, counter, convex):
 
     # Compute the convex hull of the points
     if convex:
-        hull =  ConvexHull(polygon).graham_scan()
-
+        hull = ConvexHull(polygon).graham_scan()
         # Plot the convex hull
         plt.plot([p.x for p in hull] + [hull[0].x], [p.y for p in hull] + [hull[0].y], linewidth=1, color='r')
 
+
 if __name__ == '__main__':
-    field = FieldManager(300, (10.0, 10.0), (250.0, 250.0), seed = 80)
+    field = FieldManager(300, (10.0, 10.0), (250.0, 250.0), seed=80)
 
     # read file and present the field
     show_field("data_cpp.txt", convex=False)
 
-    # show feild after convex hull
+    # show field after convex hull
     show_field("data_cpp.txt", convex=True)
-
-
-
-
-
-
