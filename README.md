@@ -33,7 +33,7 @@
 - x_2 y_2
 - .....
 - **Example**
-![field1.png](project_data/field1.png)
+![img.png](project_data/feild-1.png)
 
 ## part 3: Convex Hull problem (solving  with c++)
 - Read the data_cpp.txt file in C++ and solve the Convex-Hull problem
@@ -60,7 +60,7 @@
     
       
 - **Performing Graham Scan Algorithm for all  polygons we created in the previous step:**   
-  - ![field1.png](project_data/field2.png)
+  - ![img.png](project_data/feild-2.png)
 
 
 
