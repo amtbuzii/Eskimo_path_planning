@@ -1,6 +1,6 @@
 # Eskimo path  planning
 ### Goal - 2D problem, finding the best/shortest path (from start to end) with obstacles.
-![img.png](project_data/img.png)
+![img.png](project_data/filed_eskimo.png)
 
 ## part 1: A review of algorithms for optimally solving the path planning problem.
 -  [Algorithms review](project_data/startup%20mission%20presentaion.pdf)
@@ -33,24 +33,30 @@
 - x_2 y_2
 - .....
 - **Example**
-![img_2.png](project_data/img_2.png)
+![img_2.png](project_data/feildexample.png)
 
 ## part 3: Convex Hull problem (solving  with c++)
 - Read the data_cpp.txt file in C++ and solve the Convex-Hull problem
 - [Convex-Hull](https://en.wikipedia.org/wiki/Convex_hull)
 - Possible solutions:
   - Jarvis’ Algorithm -  $O(n^2)$
-  - Graham Scan Algorithm - $O(nlog(n))$
+  - **Graham Scan Algorithm - $O(nlog(n))$**
   - Quickhull Algorithm - $O(n^2)$
-  - **Divide and Conquer Algorithm - $O(nlog(n))$**
+  - Divide and Conquer Algorithm - $O(nlog(n))$
   - Monotone Chain Algorithm - $O(nlog(n))$
   - Incremental Algorithm - $O(nlog(n))$
   - Kirkpatrick–Seidel Algorithm — $O(nlog(n))$
   - Chan's Algorithm — $O(nlog(n))$
-- ### Divide and Conquer Algorithm
+- ### Graham Scan Algorithm
   - **Step 1:**
-    - Merge two convex to 1 in linear time
-    ![img_1.png](project_data/img_1.png)
+    - Find the point with the lowest y-coordinate
+    ![img.png](project_data/GRAHM1.png)
+  - **Step 2:**
+    - Sort the points in increasing order of the angle they and the pivot point make with the x-axis
+    ![img_1.png](project_data/GRAHM2.png)
+  - **Step 3:**
+    - Keep removing points from stack while orientation of following 3 points is not counterclockwise (or they don’t make a left turn). 
+    ![img.png](project_data/GRAHM3.png)
 
 
 ## part 4: path planning solution - A*

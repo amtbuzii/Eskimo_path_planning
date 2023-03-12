@@ -2,34 +2,32 @@
 New data structure - for circular linked list
 """
 
-class Point:
+class Node:
     def __init__(self, x, y):
         self.x = x
         self.y = y
         self.cw_next = None         # Holds the adjacent point in the clockwise direction
         self.ccw_next = None        # Holds the adjacent point in the counter clockwise direction.
 
-    def subtract(self, p):
+    def __sub__(self, other):
         """
-        Cheack if 2 points are equal.
-
+        subtract  2 points .
         :param p: Point
         :return: Point
         """
-        return Point(self.x - p.x, self.y - p.y)
+        return Node(self.x - other.x, self.y - other.y)
 
     def __str__(self):
         return '(' + str(self.x) + ', ' + str(self.y) + ')'
 
-    def __eq__(self, p):
+    def __eq__(self, other):
         """
         Cheack if 2 points are equal.
 
         :param p: Point
         :return: Boolean
         """
-
-        return self.x == p.x and self.y == p.y
+        return self.x == other.x and self.y == other.y
 
 
 def merge(convex1, convex2):
