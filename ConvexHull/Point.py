@@ -1,4 +1,4 @@
-#Define the Point class
+# Define the Point class
 
 class Point:
     def __init__(self, x, y):

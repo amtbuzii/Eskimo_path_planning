@@ -125,11 +125,13 @@ class FieldManager:
             points = "\n".join([" ".join(item) for item in temp_rnd_point.astype(str)])
             polygons_text += f"\n{counter + 1}\n{temp_dots}\n{points}"
 
-            # draw the polygon
-            self._draw_polygon(polygon=temp_rnd_point, counter=counter + 1)
-
         return polygons_text
 
+
+
+
+
+'''
     @staticmethod
     def _draw_polygon(polygon, counter):
         """
@@ -165,3 +167,4 @@ class FieldManager:
         plt.grid()
 
         plt.show()
+'''
