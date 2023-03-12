@@ -33,7 +33,7 @@
 - x_2 y_2
 - .....
 - **Example**
-![img_2.png](project_data/feildexample.png)
+![field1.png](project_data/field1.png)
 
 ## part 3: Convex Hull problem (solving  with c++)
 - Read the data_cpp.txt file in C++ and solve the Convex-Hull problem
@@ -57,6 +57,11 @@
   - **Step 3:**
     - Keep removing points from stack while orientation of following 3 points is not counterclockwise (or they don’t make a left turn). 
     ![img.png](project_data/GRAHM3.png)
+    
+      
+- **Performing Graham Scan Algorithm for all  polygons we created in the previous step:**   
+  - ![field1.png](project_data/field2.png)
+
 
 
 ## part 4: path planning solution - A*
