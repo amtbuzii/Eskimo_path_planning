@@ -46,8 +46,8 @@ def show_field(file_name, convex=False):
     plt.text(end[0] - 8, end[1] + 5, "End")
 
     # grid configurations
-    plt.xlim(0, size_x)
-    plt.ylim(0, size_y)
+    #plt.xlim(0, size_x)
+    #plt.ylim(0, size_y)
     plt.legend(loc="best")
     plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=5)
     plt.grid()
