@@ -2,12 +2,23 @@ import math
 from ConvexHull.Point import Point
 
 
+def check_input(points):
+    if len(points) < 3:  # check validity of the inputs
+        raise ValueError('need at least 3 dots')
+    for point in points:  # from list of tuple to list op Points
+        if len(point) != 2:  # check validity of the inputs
+            raise ValueError('need 2 parameters')
+        elif not isinstance(point[0], (int, float)) or not isinstance(point[0], (int, float)):
+            raise ValueError('only numbers')
+
 # Define the ConvexHull Class
 
 class ConvexHull:
     def __init__(self, points):
+        check_input(points)            #check input
         self.points = []
-        for point in points:  # from list of tuple to list op Points
+        for point in points:                # from list of tuple to list op Points
+
             self.points.append(Point(point[0], point[1]))
         self.hull = self.graham_scan()
 
@@ -20,7 +31,7 @@ class ConvexHull:
 
         # Sort the points in increasing order of the angle they and the pivot point make with the x-axis
         sorted_points = sorted(self.points, key=lambda p: (
-        math.atan2(p.y - pivot.y, p.x - pivot.x), (p.x - pivot.x) ** 2 + (p.y - pivot.y) ** 2))
+            math.atan2(p.y - pivot.y, p.x - pivot.x), (p.x - pivot.x) ** 2 + (p.y - pivot.y) ** 2))
 
         # Add the first two sorted points to the convex hull
         hull = [pivot, sorted_points[0]]

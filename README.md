@@ -1,8 +1,9 @@
 # Eskimo path  planning
 ### Goal - 2D problem, finding the best/shortest path (from start to end) with obstacles.
-![img.png](project_data/filed_eskimo.png)
 
-## part 1: A review of algorithms for optimally solving the path planning problem.
+![img.png](project_data/img.png)
+
+## Part 1: A review of algorithms for optimally solving the path planning problem.
 - Grassfire Algorithm
 - Dijkstra's Algorithm
 - A* Algorithm
@@ -17,7 +18,7 @@
 -  [PPT FILE review](project_data/startup%20mission%20presentaion.pptx)
 
 
-## part 2: Create text file with parameters needed to the algorithm
+## Part 2: Create text file with parameters needed to the algorithm
 ### Input:
 - field size
 - starting point (x,y)
@@ -46,7 +47,7 @@
 - **Example**
 ![img.png](project_data/feild-1.png)
 
-## part 3: Convex Hull problem (solving  with c++)
+## Part 3: Convex Hull problem (solving  with c++)
 - Read the data_cpp.txt file in C++ and solve the Convex-Hull problem
 - [Convex-Hull](https://en.wikipedia.org/wiki/Convex_hull)
 - Possible solutions:
@@ -75,9 +76,9 @@
 
 
 
-## part 4: path planning solution - A*
+## Part 4: path planning solution - A*
 
-## part 5: Dubbins model
+## Part 5: Dubbins model
 
   
   

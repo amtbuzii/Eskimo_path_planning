@@ -2,6 +2,8 @@ from FieldManager.FieldManager import FieldManager
 import matplotlib.pyplot as plt
 import numpy as np
 from ConvexHull.ConvexHull import ConvexHull
+from ConvexHull.Point import Point
+
 
 
 def read_field(file_name, convex):
@@ -66,13 +68,17 @@ def draw_polygon(polygon, counter, convex):
 
     # Compute the convex hull of the points
     if convex:
+        #print(polygon)
         hull = ConvexHull(polygon).graham_scan()
         # Plot the convex hull
+        #for p in hull:
+         #   print(p)
         plt.plot([p.x for p in hull] + [hull[0].x], [p.y for p in hull] + [hull[0].y], linewidth=1, color='r')
 
 
 if __name__ == '__main__':
-    field = FieldManager(300, (10.0, 10.0), (250.0, 250.0), seed=80)
+
+    field = FieldManager(size=300, start=(10.0, 10.0), end=(250.0, 250.0), seed=80)
 
     # read file and present the field
     show_field("data_cpp.txt", convex=False)
