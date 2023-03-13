@@ -1,6 +1,5 @@
 from ConvexHull.Point import Point
 
-
 def test_eq():
     # test the == operator
     p1 = Point(0, 1)

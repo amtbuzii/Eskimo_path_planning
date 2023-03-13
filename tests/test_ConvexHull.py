@@ -1,5 +1,4 @@
 import pytest
-
 from ConvexHull.ConvexHull import ConvexHull
 from ConvexHull.Point import Point
 

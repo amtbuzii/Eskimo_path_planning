@@ -68,11 +68,13 @@ class FieldManager:
         :rtype: List[int]
         """
         random.seed(seed)
-
+        if size <= 0:
+            raise ValueError('field size must be greater than 0')
         self._size = size
+
         if not self._check_input(start) or not self._check_input(end):
-            print("invalid coordinate")
-            return
+            raise ValueError('invalid coordinate')
+
         self._start = start
         self._end = end
         self._ice_num = random.randint(1, 20)  # max 19 icebergs
