@@ -84,6 +84,7 @@ if __name__ == '__main__':
     field = FieldManager(size=300, start=start_point, end=end_point, seed=9)
 #80
     #9 - not work
+    #90
     # read file and present the field
     show_field("data_cpp.txt", convex=False)
 

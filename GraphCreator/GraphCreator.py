@@ -31,8 +31,8 @@ def line_crosses_convex_shape(start_point, end_point, convex_shape):
     :rtype: bool
     """
     # Check if points are in the same convex
-    if start_point in convex_shape and end_point in convex_shape:
-        return True
+    #if start_point in convex_shape and end_point in convex_shape:
+     #   return True
 
     # convert the convex shape to a Shapely polygon
     polygon = Polygon(convex_shape)
@@ -116,8 +116,9 @@ class GraphCreator:
 
         if no_cross:
             weight = distance_2f(vertex_a, vertex_b)
+            print("new line", vertex_a, vertex_b)
             self._graph.add_edge(vertex_a, vertex_b, weight=weight)
-
+            #self.draw_graph()
 
 
     def optimal_graph(self, start_vertex):
@@ -127,6 +128,12 @@ class GraphCreator:
         """
 
         direct_line = True # if it possible to get from start_vertex to end point
+        if (start_vertex, self._end) in self._graph.edges:
+            return
+        print("strat from", start_vertex)
+
+        #############################################  - NEED TO CHECK ONLY RELEVANT POLYGONS
+
         for p in self._polygons:
             polygon1 = Polygon(p)
             if line_crosses_convex_shape(start_vertex, self._end, p):
@@ -136,13 +143,14 @@ class GraphCreator:
                 ch = get_2_points(start_vertex, self._end, p)
                 for vertex in ch:
                     self._add_edge_to_graph(start_vertex, vertex)
-                    # draw_grpah(graph)
-                    # plt.show()
-                    self.optimal_graph(vertex)
+                    found = any(vertex == tup[0] for tup in self._graph.edges)
+                    if not found:
+                        self.optimal_graph(vertex)
+
         if direct_line:
-            #print("directLine")
+            print("directLine")
             self._add_edge_to_graph(start_vertex, self._end)
-            # draw_grpah(graph)
+            return
 
     def draw_graph(self):
         pos = {point: point for point in self._graph.nodes}
