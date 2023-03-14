@@ -75,9 +75,16 @@
   - ![img.png](project_data/feild-2.png)
 
 
-
-## Part 4: path planning solution - A*
-
+## Part 4: path planning solution
+  - **Step 1: Create Graph**
+    - using networkx library
+    - 2 option to create graph:
+      - Naive ++ way- using all the grid (size*size)
+      - Naive way - create graph with all the point un the field - start, end, all convexHull point (need to check if posibble to connect)
+      - Optimal way - create graph only with the relevant convex shape
+  - **Step 2:**
+    - Solve the path planning algorithm on this graph (A*, Dijkstra, etc.)
+  
 ## Part 5: Dubbins model
 
   
