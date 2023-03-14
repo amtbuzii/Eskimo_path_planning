@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from ConvexHull.ConvexHull import ConvexHull
 from ConvexHull.Point import Point
+from GraphCreator.GraphCreator import GraphCreator
 
 
 
@@ -69,19 +70,36 @@ def draw_polygon(polygon, counter, convex):
     # Compute the convex hull of the points
     if convex:
         #print(polygon)
-        hull = ConvexHull(polygon).graham_scan()
+        hull = ConvexHull(polygon).hull
         # Plot the convex hull
         #for p in hull:
          #   print(p)
-        plt.plot([p.x for p in hull] + [hull[0].x], [p.y for p in hull] + [hull[0].y], linewidth=1, color='r')
+        plt.plot([p[0] for p in hull] + [hull[0][0]], [p[1] for p in hull] + [hull[0][1]], linewidth=1, color='r')
 
 
 if __name__ == '__main__':
+    start_point = (10.0, 10.0)
+    end_point = (250.0, 250.0)
 
-    field = FieldManager(size=300, start=(10.0, 10.0), end=(250.0, 250.0), seed=80)
-
+    field = FieldManager(size=300, start=start_point, end=end_point, seed=9)
+#80
+    #9 - not work
     # read file and present the field
     show_field("data_cpp.txt", convex=False)
 
     # show field after convex hull
     show_field("data_cpp.txt", convex=True)
+
+    #start = (0, 0)
+    #end = (20, 20)
+    #polygons = [[(1, 3), (1, 1), (3, 0)], [(4, 8), (5, 4), (6, 9)], [(0, 15), (1, 16), (20, 17)]]
+    gc = GraphCreator(start_point, end_point, field.get_convexhull_polygons())
+    #gc.naive_graph()
+    #gc.draw_graph()
+
+    gc.optimal_graph(start_point)
+    gc.draw_graph()
+
+
+
+

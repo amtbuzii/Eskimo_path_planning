@@ -1,8 +1,7 @@
 import random
 import numpy as np
-import matplotlib.pyplot as plt
 import math
-
+from ConvexHull.ConvexHull import ConvexHull
 
 def write_to_file(lines=''):
     """
@@ -78,7 +77,12 @@ class FieldManager:
         self._start = start
         self._end = end
         self._ice_num = random.randint(1, 20)  # max 19 icebergs
+        self._polygons = [[] for _ in range(self._ice_num)]
+        self._convex_hull_polygons = [[] for _ in range(self._ice_num)]
+
         polygons_text = self._create_polygons()  # write the polygons to string and show them in plot
+
+        self._convex_hull()
 
         # write the header text
         start = " ".join([str(_) for _ in self._start])
@@ -123,12 +127,13 @@ class FieldManager:
             temp_rnd_point = random_point(x_center=temp_x, y_center=temp_y, radius=temp_radius,
                                           dots=temp_dots)  # random dots coordinate
 
-            # checking that all point in the file (0 to size)
+            # checking that all point in the field (0 to size)
             for dot in temp_rnd_point:
                 dot[0] = min(dot[0], self._size-1)
                 dot[1] = min(dot[1], self._size-1)
                 dot[0] = max(dot[0], 0)
                 dot[1] = max(dot[1], 0)
+                self._polygons[counter].append(tuple(dot))
 
             # add to polygons text
             points = "\n".join([" ".join(item) for item in temp_rnd_point.astype(str)])
@@ -136,7 +141,15 @@ class FieldManager:
 
         return polygons_text
 
+    def _convex_hull(self):
+        for polygon in range(self._ice_num):
+            self._convex_hull_polygons[polygon] = ConvexHull(self._polygons[polygon]).graham_scan()
 
+    def get_field(self):
+        return self._size, self._size, self._start, self._end, self._ice_num, self._polygons, self._convex_hull_polygons
+
+    def get_convexhull_polygons(self):
+        return self._convex_hull_polygons
 
 
 
