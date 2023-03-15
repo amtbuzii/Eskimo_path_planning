@@ -2,6 +2,7 @@ import random
 import numpy as np
 import math
 from ConvexHull.ConvexHull import ConvexHull
+from constant import *
 
 def write_to_file(lines=''):
     """
@@ -10,7 +11,7 @@ def write_to_file(lines=''):
     """
 
     try:
-        with open("../Eskimo_path_planning/data_cpp.txt", "w") as file:
+        with open(FILE_PATH, "w") as file:
             file.writelines(lines)
     except FileNotFoundError:
         print("Error: The file was not found.")
@@ -56,7 +57,7 @@ def distance(x1, y1, x2, y2):
 
 
 class FieldManager:
-    def __init__(self, size=2, start=(0, 0), end=(1, 1), seed=0):
+    def __init__(self, size=MIN_SIZE, start=DEAFULT_START, end=DEAFULT_END, seed=DEAFULT_SEED):
         """
         initialize the object parameters. write to file and draw the field
 
@@ -76,7 +77,7 @@ class FieldManager:
 
         self._start = start
         self._end = end
-        self._ice_num = random.randint(1, 20)  # max 19 icebergs
+        self._ice_num = random.randint(1, MAX_ICEBERGS)
         self._polygons = [[] for _ in range(self._ice_num)]
         self._convex_hull_polygons = [[] for _ in range(self._ice_num)]
 
@@ -115,19 +116,19 @@ class FieldManager:
             # Checking the proper distance between the center point and the start and end points
             center_start_distance = distance(self._start[0], self._start[1], temp_x, temp_y)
             center_end_distance = distance(self._end[0], self._end[1], temp_x, temp_y)
-            min_radius = min(30, min(center_start_distance, center_end_distance))
+            _radius = min(MAX_RADIUS, min(center_start_distance, center_end_distance))
 
             # random radius
-            temp_radius = random.randint(1, int(min_radius))
+            temp_radius = random.randint(MIN_RADIUS, int(_radius))
 
             # random number of dots in the iceberg, (min 3)
-            temp_dots = random.randint(3, 10)
+            temp_dots = random.randint(MIN_DOTS, MAX_DOTS)
 
             # get random dots using random_point function
             temp_rnd_point = random_point(x_center=temp_x, y_center=temp_y, radius=temp_radius,
                                           dots=temp_dots)  # random dots coordinate
 
-            # checking that all point in the field (0 to size)
+            # checking that all point in the field (0 to size) - if not fix (0 or size)
             for dot in temp_rnd_point:
                 dot[0] = min(dot[0], self._size-1)
                 dot[1] = min(dot[1], self._size-1)
@@ -150,43 +151,3 @@ class FieldManager:
 
     def get_convexhull_polygons(self):
         return self._convex_hull_polygons
-
-
-
-'''
-    @staticmethod
-    def _draw_polygon(polygon, counter):
-        """
-        draw polygon dots.
-
-        :type polygon: nparray
-        :type counter: int
-        """
-
-        plt.scatter(polygon[:, 0], polygon[:, 1], s=8, label="Polygon" + str(counter))
-
-    def show_field(self):
-        """
-        Show field with start, end points and all polygons.
-        """
-
-        # figure title
-        plt.figure(1, figsize=(5, 5))
-        plt.suptitle("FieldManager field", fontsize=15)
-        plt.title("Number of icebergs = " + str(self._ice_num), fontsize=8)
-
-        # plot START + END point
-        plt.scatter(self._start[0], self._start[1], color="blue", s=10)
-        plt.text(self._start[0] - 8, self._start[1] + 5, "Start")
-        plt.scatter(self._end[0], self._end[1], color="red", s=10)
-        plt.text(self._end[0] - 8, self._end[1] + 5, "End")
-
-        # grid configurations
-        plt.xlim(0, self._size)
-        plt.ylim(0, self._size)
-        plt.legend(loc="best")
-        plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=5)
-        plt.grid()
-
-        plt.show()
-'''
