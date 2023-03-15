@@ -89,7 +89,7 @@ class GraphCreator:
         self._real_polygons = field.polygons
         self._polygons = [_ for _ in self._real_polygons]
         self._polygons_center = None
-        self.frame = 0
+        self._short_path = None
 
     def naive_graph(self):
         """
@@ -256,32 +256,51 @@ class GraphCreator:
         else:
             self.naive_graph()
 
+    def shortest_path(self):
+        self._short_path = nx.single_source_dijkstra(self._graph, self._start, self._end, weight='weight')
+
+
+
     def draw_graph(self,save =False,t=0):
         pos = {point: point for point in self._graph.nodes}
 
         # add axis
         fig, ax = plt.subplots()
-        for i,p in enumerate(self._polygons):
+        for i, p in enumerate(self._polygons):
             polygon1 = Polygon(p)
             x, y = polygon1.exterior.xy
             plt.plot(x, y)
+
         # figure title
         fig.suptitle("Eskimo field", fontsize=15)
 
         nx.draw(self._graph, pos=pos, node_size=15, ax=ax)  # draw nodes and edges
         # nx.draw_networkx_labels(self._graph, pos=pos)  # draw node labels/names
+
         # draw edge weights
         #labels = nx.get_edge_attributes(self._graph, 'weight')
         #nx.draw_networkx_edge_labels(self._graph, pos=pos, edge_labels=labels, ax=ax)
-        plt.axis("on")
-        ax.tick_params(left=True, bottom=True, labelleft=True, labelbottom=True)
 
         # plot START + END point
         ax.scatter(self._start[0], self._start[1], color="blue", marker="p", s=50, label="Start")
         ax.scatter(self._end[0], self._end[1], color="red", marker="*", s=50, label="End")
         plt.xlim(-20,320)
         plt.ylim(-20,320)
+
+        # Shortest path
+        if self._short_path is not None:
+            # draw path in red
+            path = self._short_path[1]
+            path_edges = list(zip(path, path[1:]))
+            nx.draw_networkx_nodes(self._graph, pos, nodelist=path, node_size=15, node_color='r', ax=ax)
+            nx.draw_networkx_edges(self._graph, pos, edgelist=path_edges, edge_color='r', ax=ax)
+            # Adding text inside a rectangular box by using the keyword 'bbox'
+            plt.text(170, -5, 'Path length '+str(("%.2f" % self._short_path[0])), fontsize=15,
+                     bbox=dict(facecolor='red', alpha=0.5))
+
         # grid configurations
+        plt.axis("on")
+        ax.tick_params(left=True, bottom=True, labelleft=True, labelbottom=True)
         ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=5)
         # ax.grid()
         #if save: plt.savefig(f'./img/img_{t}.png', transparent=False,facecolor='white')
