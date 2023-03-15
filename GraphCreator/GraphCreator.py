@@ -266,5 +266,5 @@ class GraphCreator:
 
         # grid configurations
         ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=5)
-        ax.grid()
+        # ax.grid()
         plt.show()
