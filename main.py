@@ -5,37 +5,48 @@ from GraphCreator.GraphCreator import GraphCreator
 if __name__ == '__main__':
     '''
     seed option to show:
+    MAX_RADIUS = 150  # MAX radius size
+
     - 80 - to movie
     - 9
     - 90
     - 199 - special case
+    - 50 nice
+    - 95 BUG NEED TO UNDERSTAND
+    
+    MAX_RADIUS = 30  # MAX radius size
+
+    
     '''
 
     # Step 1: Field parameters
     start_point = (10.0, 10.0)
     end_point = (250.0, 250.0)
     field_size = 300
-    rand_seed = 9
+    rand_seed = 36
 
     # Step 2: Start the program - create the field and write to file
     field_m = FieldManager(size=field_size, start=start_point, end=end_point, seed=rand_seed)
 
     # Step 3: Read from file and show the field - need to be correct.....
     test_field = read_field(FILE_PATH)
-    #show_field(test_field, convex=False)
+    show_field(test_field, convex=False)
 
     # Step 4 - Convex Hull
     test_field.polygons = field_m.get_convexhull_polygons()
-    #show_field(test_field, convex=True)
+    show_field(test_field, convex=True)
 
     # Step 5 - Create  naive Graph (naive and optimal)
     gc = GraphCreator(test_field)
-    gc.naive_graph()
-    gc.draw_graph()
-
-    # Step 6 - Create  naive Graph (naive and optimal)
-    #gc.optimal_graph()
+    #gc.naive_graph()
     #gc.draw_graph()
+
+    #gc.shortest_path()
+    #gc.draw_graph()
+
+    # Step 6 - Create optimal Graph (naive and optimal)
+    gc.optimal_graph()
+    gc.draw_graph()
 
     # Step 7 - Find the Shortest Path
     gc.shortest_path()

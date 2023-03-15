@@ -90,6 +90,7 @@ class GraphCreator:
         self._polygons = [_ for _ in self._real_polygons]
         self._polygons_center = None
         self._short_path = None
+        # self.frame = 0
 
     def naive_graph(self):
         """
@@ -160,6 +161,8 @@ class GraphCreator:
         if no_cross:
             weight = distance_2f(vertex_a, vertex_b)
             self._graph.add_edge(vertex_a, vertex_b, weight=weight)
+            return True
+        return False
 
     def optimal_graph(self):
         """
@@ -208,9 +211,6 @@ class GraphCreator:
 
         direct_line = True  # if it possible to get from start_vertex to end point
 
-        #if (start_vertex, self._end) in self._graph.edges:
-         #  return
-
         _relevant_polygons = dict()
         same_polygon = False
         for index, polygon in enumerate(self._polygons):
@@ -229,12 +229,17 @@ class GraphCreator:
                 p = self._polygons[min(_relevant_polygons, key=_relevant_polygons.get)]
             ch = get_2_points(start_vertex, self._end, p)
             for vertex in ch:
-                self._add_edge_to_graph(start_vertex, vertex)
-                found = any(vertex == tup[0] for tup in self._graph.edges)
-                if not found:
-                    self._rec_optimal_graph(vertex)
+                if (self._add_edge_to_graph(start_vertex, vertex)):
+                    #self.draw_graph()
+                    #self.frame+=1
+                    found = any(vertex == tup[0] for tup in self._graph.edges)
+                    if not found:
+                        self._rec_optimal_graph(vertex)
         else: # there is direct line between start_vertex to end
             self._add_edge_to_graph(start_vertex, self._end)
+            #self.draw_graph(True, self.frame)
+            # self.frame+=1
+
             return
 
     def _polygons_center_calc(self):
@@ -292,8 +297,8 @@ class GraphCreator:
             # draw path in red
             path = self._short_path[1]
             path_edges = list(zip(path, path[1:]))
-            nx.draw_networkx_nodes(self._graph, pos, nodelist=path, node_size=15, node_color='r', ax=ax)
-            nx.draw_networkx_edges(self._graph, pos, edgelist=path_edges, edge_color='r', ax=ax)
+            nx.draw_networkx_nodes(self._graph, pos, nodelist=path, node_size=5, node_color='r', ax=ax)
+            nx.draw_networkx_edges(self._graph, pos, edgelist=path_edges, width=6, alpha=0.3, edge_color='r', ax=ax)
             # Adding text inside a rectangular box by using the keyword 'bbox'
             plt.text(170, -5, 'Path length '+str(("%.2f" % self._short_path[0])), fontsize=15,
                      bbox=dict(facecolor='red', alpha=0.5))
