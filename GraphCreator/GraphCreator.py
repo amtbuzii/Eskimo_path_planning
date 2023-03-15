@@ -6,7 +6,6 @@ import networkx as nx
 import math
 from itertools import combinations
 from shapely.ops import unary_union
-from FieldManager.Field import Field
 
 
 def distance_2f(vertex_a, vertex_b):
@@ -89,24 +88,37 @@ class GraphCreator:
         self._end = field.end
         self._real_polygons = field.polygons
         self._polygons = [_ for _ in self._real_polygons]
-        self._polygons_center = self._polygons_center_calc()
+        self._polygons_center = None
+        self.frame = 0
 
-    def _union_convex(self):
+    def naive_graph(self):
         """
-        union crosses convexes shape to new convex shape - relevant to optimal solution.
+        create a naive graph.
+        points = start, end, all convex dots
+        create edge only if the edge not cross anything
 
-        :rtype: None
+        :rtype: nx Graph
         """
-        pair_polygons = itertools.combinations(self._polygons, 2)
-        for pair in pair_polygons:
-            if Polygon(pair[0]).intersects(Polygon(pair[1])):
-                new_convex = ConvexHull(pair[0] + pair[1]).graham_scan()
-                self._polygons.append(new_convex)
-                self._polygons.remove(pair[0])
-                self._polygons.remove(pair[1])
-                self._union_convex()
-                return
-        return
+        self._graph = nx.Graph()
+        self._polygons = [_ for _ in self._real_polygons]
+        self._union_not_convex()
+
+        # all points in one list
+        all_points = [self._start, self._end]
+        for i in self._polygons:
+            for j in i:
+                all_points.append(j)
+
+        # Get all combinations of points - no return
+        comb = combinations(all_points, 2)
+
+        # for each pair, check if it possible to create edge
+        for pair in list(comb):
+            vertex_a = pair[0]
+            vertex_b = pair[1]
+            self._add_edge_to_graph(vertex_a, vertex_b)
+
+        return self._graph
 
     def _union_not_convex(self):
         """
@@ -131,32 +143,6 @@ class GraphCreator:
                 return
         return
 
-    def naive_graph(self):
-        """
-        create a naive graph.
-        points = start, end, all convex dots
-        create edge only if the edge not cross anything
-
-        :rtype: nx Graph
-        """
-        self._graph = nx.Graph()
-        self._union_not_convex()
-        # all points in one list
-        all_points = [self._start, self._end]
-        for i in self._polygons:
-            for j in i:
-                all_points.append(j)
-
-        # Get all combinations of points - no return
-        comb = combinations(all_points, 2)
-
-        # for each pair, check if it possible to create edge
-        for pair in list(comb):
-            vertex_a = pair[0]
-            vertex_b = pair[1]
-            self._add_edge_to_graph(vertex_a, vertex_b)
-
-        return self._graph
 
     def _add_edge_to_graph(self, vertex_a, vertex_b):
         """
@@ -171,20 +157,45 @@ class GraphCreator:
             if line_crosses_convex_shape(vertex_a, vertex_b, p):
                 no_cross = False  # False - Not possible to connect
                 break
-
         if no_cross:
             weight = distance_2f(vertex_a, vertex_b)
-            #print("new line", vertex_a, vertex_b)
             self._graph.add_edge(vertex_a, vertex_b, weight=weight)
-            # self.draw_graph()
 
     def optimal_graph(self):
         """
         create optimal graph (using recrsive function - self._rec_optimal_graph
         """
         self._graph = nx.Graph()
+        self._polygons = [_ for _ in self._real_polygons]
         self._union_convex()
+
+        start_point = Point(self._start)
+        end_point = Point(self._end)
+        for p in self._polygons:
+            polygon = Polygon(p)
+            if (polygon.contains(start_point)) or (polygon.contains(end_point)):
+                print("No optimal solution")
+                exit()
+
+        self._polygons_center = self._polygons_center_calc()
         self._rec_optimal_graph(self._start)
+
+    def _union_convex(self):
+        """
+        union crosses convexes shape to new convex shape - relevant to optimal solution.
+
+        :rtype: None
+        """
+        pair_polygons = itertools.combinations(self._polygons, 2)
+        for pair in pair_polygons:
+            if Polygon(pair[0]).intersects(Polygon(pair[1])):
+                new_convex = ConvexHull(pair[0] + pair[1]).graham_scan()
+                self._polygons.append(new_convex)
+                self._polygons.remove(pair[0])
+                self._polygons.remove(pair[1])
+                self._union_convex()
+                return
+        return
 
     def _rec_optimal_graph(self, start_vertex):
         """
@@ -201,22 +212,28 @@ class GraphCreator:
          #  return
 
         _relevant_polygons = dict()
-
+        same_polygon = False
         for index, polygon in enumerate(self._polygons):
             if line_crosses_convex_shape(start_vertex, self._end, polygon):
                 direct_line = False
-                _relevant_polygons[index] = distance_2f(start_vertex, self._polygons_center[index])
+                if start_vertex in polygon:
+                    same_polygon = True
+                    break
+                else:
+                    _relevant_polygons[index] = distance_2f(start_vertex, self._polygons_center[index])
 
         if not direct_line:
-
-            p = self._polygons[min(_relevant_polygons, key=_relevant_polygons.get)]
+            if same_polygon:
+                p = self._polygons[index]
+            else:
+                p = self._polygons[min(_relevant_polygons, key=_relevant_polygons.get)]
             ch = get_2_points(start_vertex, self._end, p)
             for vertex in ch:
                 self._add_edge_to_graph(start_vertex, vertex)
                 found = any(vertex == tup[0] for tup in self._graph.edges)
                 if not found:
                     self._rec_optimal_graph(vertex)
-        else:
+        else: # there is direct line between start_vertex to end
             self._add_edge_to_graph(start_vertex, self._end)
             return
 
@@ -237,15 +254,14 @@ class GraphCreator:
         except Exception as e:
             print("Error: An unexpected error occurred -", e)
         else:
-            self._polygons = [_ for _ in self._real_polygons]
             self.naive_graph()
 
-    def draw_graph(self):
+    def draw_graph(self,save =False,t=0):
         pos = {point: point for point in self._graph.nodes}
 
         # add axis
         fig, ax = plt.subplots()
-        for p in self._polygons:
+        for i,p in enumerate(self._polygons):
             polygon1 = Polygon(p)
             x, y = polygon1.exterior.xy
             plt.plot(x, y)
@@ -255,16 +271,18 @@ class GraphCreator:
         nx.draw(self._graph, pos=pos, node_size=15, ax=ax)  # draw nodes and edges
         # nx.draw_networkx_labels(self._graph, pos=pos)  # draw node labels/names
         # draw edge weights
-        # labels = nx.get_edge_attributes(self._graph, 'weight')
-        # nx.draw_networkx_edge_labels(self._graph, pos=pos, edge_labels=labels, ax=ax)
+        #labels = nx.get_edge_attributes(self._graph, 'weight')
+        #nx.draw_networkx_edge_labels(self._graph, pos=pos, edge_labels=labels, ax=ax)
         plt.axis("on")
         ax.tick_params(left=True, bottom=True, labelleft=True, labelbottom=True)
 
         # plot START + END point
         ax.scatter(self._start[0], self._start[1], color="blue", marker="p", s=50, label="Start")
         ax.scatter(self._end[0], self._end[1], color="red", marker="*", s=50, label="End")
-
+        plt.xlim(-20,320)
+        plt.ylim(-20,320)
         # grid configurations
         ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=5)
         # ax.grid()
+        #if save: plt.savefig(f'./img/img_{t}.png', transparent=False,facecolor='white')
         plt.show()

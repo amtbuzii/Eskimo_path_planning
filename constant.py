@@ -56,7 +56,7 @@ def show_field(field_data, convex):
 
     # figure title
     # plt.figure(1, figsize=(5, 5))
-    plt.suptitle("Eskimo field", fontsize=15)
+    #plt.suptitle("Eskimo field", fontsize=15)
 
     # plot START + END point
     plt.scatter(field_data.start[0], field_data.start[1], color="blue", marker="p", s=50, label="Start")
@@ -69,9 +69,10 @@ def show_field(field_data, convex):
         plt.scatter(p[:, 0], p[:, 1], s=8)
         if convex:
             plt.plot([p[0] for p in polygon] + [polygon[0][0]], [p[1] for p in polygon] + [polygon[0][1]], linewidth=1)
-
+    plt.xlim(-20,320)
+    plt.ylim(-20,320)
     # grid configurations
-    plt.legend(loc="best")
     plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=5)
     # plt.grid()
+    #plt.savefig(f'./img/img_-1.png', transparent=False, facecolor='white')
     plt.show()
