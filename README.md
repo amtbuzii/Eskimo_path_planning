@@ -77,13 +77,39 @@
 
 ## Part 4: path planning solution
   - **Step 1: Create Graph**
-    - using networkx library
+    - Using networkx library.
     - 2 option to create graph:
       - Naive ++ way- using all the grid (size*size)
-      - Naive way - create graph with all the point un the field - start, end, all convexHull point (need to check if posibble to connect)
-      - Optimal way - create graph only with the relevant convex shape
+      ## Naive way: all vertexes available
+        - Union of the polygons that touch each other. (**not convex** shape)
+        - Connect all points in the field. (need to check if possible to connect)
+        ![img.png](project_data/naive.png)
+      
+      ## Optimal way:  create graph only with the relevant convex shape.
+        1. Union of the polygons that touch each other. (**convex** shape)
+        2. If start/end point inside the union polygons - go to naive solution...
+        3. Recursive_algorithm(start_point):
+          - If a straight line can be connected between the point and the end - done.
+          - else:
+            - p = Find the polygon that is between the start point and the end point.
+            - Do ConvexHull(start, end, p)
+            - s_left, s_right = 2 points on the new polygon that are on either side of the starting point.
+            - Recursive_algorithm(s_left)
+            - Recursive_algorithm(s_right)
+           
+      **Example GIF**
+    
+      ![img.png](project_data/example_gif.gif)
+    
+    
   - **Step 2:**
     - Solve the path planning algorithm on this graph (A*, Dijkstra, etc.)
+      - Example 1:
+        - ![img.png](project_data/naive_sol.png)
+        - ![img.png](project_data/optimal_sol.png)
+      - Example 2:
+        - ![img.png](project_data/naive_sol2.png)
+        - ![img.png](project_data/op_sol1.png)
   
 ## Part 5: Dubbins model
 
