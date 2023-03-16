@@ -12,11 +12,11 @@ DEAFULT_END = (1, 1)
 FILE_PATH = "../Eskimo_path_planning/data_cpp.txt"
 
 # icebergs parameters
-MAX_ICEBERGS = 20  # maximum number of icebergs
+MAX_ICEBERGS = 70  # maximum number of icebergs
 MIN_DOTS = 3  # min dots in each icebergs
 MAX_DOTS = 10  # max dots in each icebergs
-MIN_RADIUS = 1  # MIN radius size
-MAX_RADIUS = 150  # MAX radius size
+MIN_RADIUS = 15  # MIN radius size
+MAX_RADIUS = 25  # MAX radius size
 
 
 # Function
@@ -69,8 +69,8 @@ def show_field(field_data, convex):
         plt.scatter(p[:, 0], p[:, 1], s=8)
         if convex:
             plt.plot([p[0] for p in polygon] + [polygon[0][0]], [p[1] for p in polygon] + [polygon[0][1]], linewidth=1)
-    plt.xlim(-20,320)
-    plt.ylim(-20,320)
+    # plt.xlim(-20,320)
+    # plt.ylim(-20,320)
     # grid configurations
     plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=5)
     # plt.grid()

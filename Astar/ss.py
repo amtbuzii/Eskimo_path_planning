@@ -65,7 +65,7 @@ def distance(vertex_a, vertex_b):
     x_1, y_1 = vertex_a[0], vertex_a[1]
     x_2, y_2 = vertex_b[0], vertex_b[1]
     dis = math.sqrt((x_1 - x_2) ** 2 + (y_1 - y_2) ** 2)
-    return float("%.2f" % dis)
+    return round(dis, 2)
 
 def create_graph(graph, start, end, polygons):
     direct_line = True

@@ -119,7 +119,7 @@ class FieldManager:
             _radius = min(MAX_RADIUS, min(center_start_distance, center_end_distance))
 
             # random radius
-            temp_radius = random.randint(MIN_RADIUS, int(_radius))
+            temp_radius = random.randint(min(MIN_RADIUS,int(_radius)), int(_radius))
 
             # random number of dots in the iceberg, (min 3)
             temp_dots = random.randint(MIN_DOTS, MAX_DOTS)
