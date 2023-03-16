@@ -19,7 +19,9 @@ def distance_2f(vertex_a, vertex_b):
     x_1, y_1 = vertex_a[0], vertex_a[1]
     x_2, y_2 = vertex_b[0], vertex_b[1]
     dis = math.sqrt((x_1 - x_2) ** 2 + (y_1 - y_2) ** 2)
-    return float("%.2f" % dis)
+    return round(dis, 2)
+
+
 
 
 def centroid(vertexes):
@@ -72,13 +74,10 @@ def get_2_points(vertex_a, vertex_b, convex_shape):
     start_index = new_convex.index(vertex_a)
 
     # return the neighbors to the start point
+    before = (start_index - 1) % len(new_convex)
+    after = (start_index + 1) % len(new_convex)
 
-    if start_index == len(new_convex) - 1:
-        before = (start_index - 1) % len(new_convex)
-        after = (start_index + 1) % len(new_convex)
-        return new_convex[before], new_convex[after]
-
-    return new_convex[start_index - 1], new_convex[start_index + 1]
+    return new_convex[before], new_convex[after]
 
 
 class GraphCreator:
@@ -305,8 +304,8 @@ class GraphCreator:
             path_edges = list(zip(path, path[1:]))
             nx.draw_networkx_nodes(self._graph, pos, nodelist=path, node_size=5, node_color='r', ax=ax)
             nx.draw_networkx_edges(self._graph, pos, edgelist=path_edges, width=6, alpha=0.3, edge_color='r', ax=ax)
-            # Adding text inside a rectangular box by using the keyword 'bbox'
-            plt.text(170, -5, 'Path length ' + str(("%.2f" % self._short_path[0])), fontsize=15,
+            # Adding text
+            plt.text(0, -5, 'Path length ' + str(("%.2f" % self._short_path[0])), fontsize=10,
                      bbox=dict(facecolor='red', alpha=0.5))
 
         # grid configurations

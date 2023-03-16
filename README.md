@@ -101,7 +101,6 @@
     
       ![img.png](project_data/example_gif.gif)
     
-    
   - **Step 2:**
     - Solve the path planning algorithm on this graph (A*, Dijkstra, etc.)
       - Example 1:
@@ -110,6 +109,17 @@
       - Example 2:
         - ![img.png](project_data/naive_sol2.png)
         - ![img.png](project_data/op_sol1.png)
+    
+    ## Runtime analysis (example)
+    ![img.png](project_data/runtime1.png)
+    ### Naive way:
+    - Path length:  826.3100000000001
+    - Runtime:  24.320584774017334
+    ![img.png](project_data/runtime2.png)
+      ### Optimal way:
+    - Path length:  826.3100000000001
+    - Runtime:  0.17542123794555664
+    ![img.png](project_data/runtime3.png)   
   
 ## Part 5: Dubbins model
 

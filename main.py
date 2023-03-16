@@ -26,12 +26,11 @@ if __name__ == '__main__':
 
     # Step 1: Field parameters
     field_size = random.randint(100, 600)
-    print(field_size)
     # field_size = 192
     # start_point = random_point(field_size)
     # end_point = random_point(field_size)
     start_point = (5, 5)
-    end_point = (field_size - 10, field_size-10)
+    end_point = (field_size-10, field_size-10)
     rand_seed = 99
 
     # Step 2: Start the program - create the field and write to file
@@ -39,7 +38,7 @@ if __name__ == '__main__':
 
     # Step 3: Read from file and show the field - need to be correct.....
     test_field = read_field(FILE_PATH)
-    #show_field(test_field, convex=False)
+    show_field(test_field, convex=False)
 
     # Step 4 - Convex Hull
     test_field.polygons = field_m.get_convexhull_polygons()
@@ -49,23 +48,21 @@ if __name__ == '__main__':
     gc = GraphCreator(test_field)
     start_time = time.time()
     gc.create_graph(type="naive")
-    print("naive length: ",gc.shortest_path())
-    gc.draw_graph()
+    print("naive length: ", gc.shortest_path())
     print("naive time: ", time.time()-start_time)
+    gc.draw_graph()
 
     # Step 6 - Create optimal Graph
     start_time = time.time()
     gc.create_graph(type="optimal")
 
     # Step 7 - Find the Shortest Path
-    print("optimal length: ",gc.shortest_path())
-    gc.draw_graph()
+    print("optimal length: ", gc.shortest_path())
     print("optimal time: ", time.time()-start_time)
+    gc.draw_graph()
 
     # Step 8 - Dubins extension
     pass
-
-
 
 '''
  frames = []
