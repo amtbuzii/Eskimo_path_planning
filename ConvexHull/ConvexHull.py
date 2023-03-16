@@ -8,7 +8,7 @@ def check_input(points):
     for point in points:  # from list of tuple to list op Points
         if len(point) != 2:  # check validity of the inputs
             raise ValueError('need 2 parameters')
-        elif not isinstance(point[0], (int, float)) or not isinstance(point[0], (int, float)):
+        elif not isinstance(point[0], (int, float)) or not isinstance(point[1], (int, float)):
             raise ValueError('only numbers')
 
 

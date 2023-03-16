@@ -270,6 +270,7 @@ class GraphCreator:
 
     def shortest_path(self):
         self._short_path = nx.single_source_dijkstra(self._graph, self._start, self._end, weight='weight')
+        return(self._short_path[0])
 
     def draw_graph(self, save=False, t=0):
         pos = {point: point for point in self._graph.nodes}
@@ -294,8 +295,8 @@ class GraphCreator:
         # plot START + END point
         ax.scatter(self._start[0], self._start[1], color="blue", marker="p", s=50, label="Start")
         ax.scatter(self._end[0], self._end[1], color="red", marker="*", s=50, label="End")
-        plt.xlim(-20, 320)
-        plt.ylim(-20, 320)
+        #plt.xlim(-20, 320)
+        #plt.ylim(-20, 320)
 
         # Shortest path
         if self._short_path is not None:
