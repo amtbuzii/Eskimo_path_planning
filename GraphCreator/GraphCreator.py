@@ -92,7 +92,21 @@ class GraphCreator:
         self._short_path = None
         # self.frame = 0
 
-    def naive_graph(self):
+    def create_graph(self, type = "naive"):
+        self._graph = nx.Graph()
+        self._polygons = [_ for _ in self._real_polygons]
+        self._short_path = None
+
+        if type == "naive":
+            self._union_not_convex()
+            self._naive_graph()
+        elif type == "optimal":
+            self._union_convex()
+            self._optimal_graph()
+        else:
+            raise ValueError('invalid graph type (naive or optimal')
+
+    def _naive_graph(self):
         """
         create a naive graph.
         points = start, end, all convex dots
@@ -100,20 +114,17 @@ class GraphCreator:
 
         :rtype: nx Graph
         """
-        self._graph = nx.Graph()
-        self._polygons = [_ for _ in self._real_polygons]
-        self._union_not_convex()
 
-        # all points in one list
+        # All points in one list
         all_points = [self._start, self._end]
         for i in self._polygons:
             for j in i:
                 all_points.append(j)
 
-        # Get all combinations of points - no return
+        # Get all combinations of points - no return.
         comb = combinations(all_points, 2)
 
-        # for each pair, check if it possible to create edge
+        # For each pair, check if it is possible to create edge.
         for pair in list(comb):
             vertex_a = pair[0]
             vertex_b = pair[1]
@@ -133,7 +144,7 @@ class GraphCreator:
             polygon2 = Polygon(pair[1])
             if polygon1.intersects(polygon2):
                 new_convex = unary_union([polygon1, polygon2])
-                #new_convex = cascaded_union([polygon1, polygon2])
+                # new_convex = cascaded_union([polygon1, polygon2])
                 new_convex = mapping(new_convex)
                 new_convex = [_ for _ in new_convex['coordinates'][0]]  # convert to list of tuple [(x,y),(x,y),(x,
                 # y)...]
@@ -143,7 +154,6 @@ class GraphCreator:
                 self._union_not_convex()
                 return
         return
-
 
     def _add_edge_to_graph(self, vertex_a, vertex_b):
         """
@@ -164,13 +174,10 @@ class GraphCreator:
             return True
         return False
 
-    def optimal_graph(self):
+    def _optimal_graph(self):
         """
         create optimal graph (using recrsive function - self._rec_optimal_graph
         """
-        self._graph = nx.Graph()
-        self._polygons = [_ for _ in self._real_polygons]
-        self._union_convex()
 
         start_point = Point(self._start)
         end_point = Point(self._end)
@@ -230,14 +237,14 @@ class GraphCreator:
             ch = get_2_points(start_vertex, self._end, p)
             for vertex in ch:
                 if (self._add_edge_to_graph(start_vertex, vertex)):
-                    #self.draw_graph()
-                    #self.frame+=1
+                    # self.draw_graph()
+                    # self.frame+=1
                     found = any(vertex == tup[0] for tup in self._graph.edges)
                     if not found:
                         self._rec_optimal_graph(vertex)
-        else: # there is direct line between start_vertex to end
+        else:  # there is direct line between start_vertex to end
             self._add_edge_to_graph(start_vertex, self._end)
-            #self.draw_graph(True, self.frame)
+            # self.draw_graph(True, self.frame)
             # self.frame+=1
 
             return
@@ -264,9 +271,7 @@ class GraphCreator:
     def shortest_path(self):
         self._short_path = nx.single_source_dijkstra(self._graph, self._start, self._end, weight='weight')
 
-
-
-    def draw_graph(self,save =False,t=0):
+    def draw_graph(self, save=False, t=0):
         pos = {point: point for point in self._graph.nodes}
 
         # add axis
@@ -283,14 +288,14 @@ class GraphCreator:
         # nx.draw_networkx_labels(self._graph, pos=pos)  # draw node labels/names
 
         # draw edge weights
-        #labels = nx.get_edge_attributes(self._graph, 'weight')
-        #nx.draw_networkx_edge_labels(self._graph, pos=pos, edge_labels=labels, ax=ax)
+        # labels = nx.get_edge_attributes(self._graph, 'weight')
+        # nx.draw_networkx_edge_labels(self._graph, pos=pos, edge_labels=labels, ax=ax)
 
         # plot START + END point
         ax.scatter(self._start[0], self._start[1], color="blue", marker="p", s=50, label="Start")
         ax.scatter(self._end[0], self._end[1], color="red", marker="*", s=50, label="End")
-        plt.xlim(-20,320)
-        plt.ylim(-20,320)
+        plt.xlim(-20, 320)
+        plt.ylim(-20, 320)
 
         # Shortest path
         if self._short_path is not None:
@@ -300,7 +305,7 @@ class GraphCreator:
             nx.draw_networkx_nodes(self._graph, pos, nodelist=path, node_size=5, node_color='r', ax=ax)
             nx.draw_networkx_edges(self._graph, pos, edgelist=path_edges, width=6, alpha=0.3, edge_color='r', ax=ax)
             # Adding text inside a rectangular box by using the keyword 'bbox'
-            plt.text(170, -5, 'Path length '+str(("%.2f" % self._short_path[0])), fontsize=15,
+            plt.text(170, -5, 'Path length ' + str(("%.2f" % self._short_path[0])), fontsize=15,
                      bbox=dict(facecolor='red', alpha=0.5))
 
         # grid configurations
@@ -308,5 +313,5 @@ class GraphCreator:
         ax.tick_params(left=True, bottom=True, labelleft=True, labelbottom=True)
         ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=5)
         # ax.grid()
-        #if save: plt.savefig(f'./img/img_{t}.png', transparent=False,facecolor='white')
+        # if save: plt.savefig(f'./img/img_{t}.png', transparent=False,facecolor='white')
         plt.show()

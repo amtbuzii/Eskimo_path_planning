@@ -15,15 +15,13 @@ if __name__ == '__main__':
     - 95 BUG NEED TO UNDERSTAND
     
     MAX_RADIUS = 30  # MAX radius size
-
-    
     '''
 
     # Step 1: Field parameters
     start_point = (10.0, 10.0)
     end_point = (250.0, 250.0)
     field_size = 300
-    rand_seed = 36
+    rand_seed = 16
 
     # Step 2: Start the program - create the field and write to file
     field_m = FieldManager(size=field_size, start=start_point, end=end_point, seed=rand_seed)
@@ -36,25 +34,24 @@ if __name__ == '__main__':
     test_field.polygons = field_m.get_convexhull_polygons()
     show_field(test_field, convex=True)
 
-    # Step 5 - Create  naive Graph (naive and optimal)
+    # Step 5 - Create naive Graph
     gc = GraphCreator(test_field)
-    #gc.naive_graph()
-    #gc.draw_graph()
-
-    #gc.shortest_path()
-    #gc.draw_graph()
-
-    # Step 6 - Create optimal Graph (naive and optimal)
-    gc.optimal_graph()
+    gc.create_graph(type="naive")
+    gc.shortest_path()
     gc.draw_graph()
+
+    # Step 6 - Create optimal Graph
+    gc.create_graph(type="optimal")
 
     # Step 7 - Find the Shortest Path
     gc.shortest_path()
     gc.draw_graph()
 
-
-    # Step 8 - Dubbins extension
+    # Step 8 - Dubins extension
     pass
+
+
+
 '''
  frames = []
     for t in range(14):

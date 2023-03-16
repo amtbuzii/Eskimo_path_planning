@@ -44,9 +44,11 @@ class ConvexHull:
         # convert to list of tuple [(x,y),(x,y),(x,y)...]
         hull = [(p.x, p.y) for p in hull]
 
+        # special case - all vertex on the same line - the convexHull is only 2 point - add 3rd point
+        if len(hull) == 2:
+            hull.append(hull[1])
+
         return hull
-
-
 
 
 def orientation(p, q, r):

@@ -144,7 +144,7 @@ class FieldManager:
 
     def _convex_hull(self):
         for polygon in range(self._ice_num):
-            self._convex_hull_polygons[polygon] = ConvexHull(self._polygons[polygon]).graham_scan()
+            self._convex_hull_polygons[polygon] = ConvexHull(self._polygons[polygon]).hull
 
     def get_field(self):
         return self._size, self._size, self._start, self._end, self._ice_num, self._polygons, self._convex_hull_polygons
