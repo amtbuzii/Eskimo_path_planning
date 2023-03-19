@@ -1,6 +1,6 @@
 import pytest
 from ConvexHull.ConvexHull import ConvexHull
-from ConvexHull.Point import Point
+from Point.Point import Point
 
 
 def test_convex1():

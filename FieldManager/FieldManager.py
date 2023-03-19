@@ -2,72 +2,20 @@ import random
 import numpy as np
 import math
 from ConvexHull.ConvexHull import ConvexHull
-from constant import *
-
-def write_to_file(lines=''):
-    """
-    write the data to file.
-    :type lines: string
-    """
-
-    try:
-        with open(FILE_PATH, "w") as file:
-            file.writelines(lines)
-    except FileNotFoundError:
-        print("Error: The file was not found.")
-    except PermissionError:
-        print("Error: You don't have the required permissions to access the file.")
-    except OSError as e:
-        print("Error: An operating system error occurred -", e)
-    except ValueError:
-        print("Error: Invalid value or format.")
-    except TypeError:
-        print("Error: Invalid data type.")
-    except Exception as e:
-        print("Error: An unexpected error occurred -", e)
-    else:
-        print("The data was successfully written to the file.")
-
-
-def random_point(x_center, y_center, radius, dots):
-    """
-    generate random points for each polygon. (using rejection sampling method - 78.5% success)
-
-    :type x_center: int
-    :type y_center: int
-    :type radius: int
-    :type dots: int
-    :rtype: nparray[n, (x,y)]
-    """
-    rnd_points = np.zeros([dots, 2])
-
-    for i in range(dots):
-        while True:
-            x = random.random() * radius * 2 - radius
-            y = random.random() * radius * 2 - radius
-            if x * x + y * y < (radius * radius):  # check correctness of the coordinate
-                rnd_points[i, :] = x_center + x, y_center + y
-                break
-
-    return rnd_points
-
-
-def distance(x1, y1, x2, y2):
-    return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
+import constant
+from Point.Point import Point
+import FileHandler.FileHandler as fh
+from FieldManager.Field import Field
 
 
 class FieldManager:
-    def __init__(self, size=MIN_SIZE, start=DEAFULT_START, end=DEAFULT_END, seed=DEAFULT_SEED):
+    def __init__(self, size: int = constant.MIN_SIZE, start: Point = constant.DEAFULT_START,
+                 end: Point = constant.DEAFULT_END, seed: int = constant.DEAFULT_SEED):
         """
         initialize the object parameters. write to file and draw the field
-
-        :type size: int
-        :type start: tuple
-        :type end: tuple
-        :type seed: int
-        :rtype: List[int]
         """
         random.seed(seed)
+
         if size <= 0:
             raise ValueError('field size must be greater than 0')
         self._size = size
@@ -77,77 +25,71 @@ class FieldManager:
 
         self._start = start
         self._end = end
-        self._ice_num = random.randint(1, MAX_ICEBERGS)
-        self._polygons = [[] for _ in range(self._ice_num)]
-        self._convex_hull_polygons = [[] for _ in range(self._ice_num)]
+        self._ice_num = random.randint(1, constant.MAX_ICEBERGS)
+        self._polygons = self._create_polygons()  # write the polygons to string and show them in plot
+        self._convex_hull = self._convex_hull()
 
-        polygons_text = self._create_polygons()  # write the polygons to string and show them in plot
+        self.field_parameters = Field(self._size, self._start, self._end, self._polygons)
+        fh.create_file(self.field_parameters)
 
-        self._convex_hull()
-
-        # write the header text
-        start = " ".join([str(_) for _ in self._start])
-        end = " ".join([str(_) for _ in self._end])
-        header_text = f"{self._size}\n{self._size}\n{start}\n{end}\n{self._ice_num}"
-
-        # write to file
-        write_to_file(lines=header_text + polygons_text)
-
-    def _check_input(self, coordinate):
+    def _check_input(self, point: Point):
         # check start point
-        x = coordinate[0]
-        y = coordinate[1]
-        if x < 0 or x > self._size or y < 0 or y > self._size:
+        if point.x < 0 or point.x > self._size or point.y < 0 or point.y > self._size:
             return False
         return True
 
-    def _create_polygons(self):
+    def _create_polygons(self) -> list[list]:
         """
         create random polygons (icebergs)
-        :rtype: string
         """
-        polygons_text = ''
+        polygons = [[] for _ in range(self._ice_num)]
 
-        for counter in range(self._ice_num):
+        for polygon in range(self._ice_num):
             # random center coordinate
-            temp_x = random.randint(0, self._size)
-            temp_y = random.randint(0, self._size)
+            temp_point = Point(random.randint(0, self._size), random.randint(0, self._size))
 
             # Checking the proper distance between the center point and the start and end points
-            center_start_distance = distance(self._start[0], self._start[1], temp_x, temp_y)
-            center_end_distance = distance(self._end[0], self._end[1], temp_x, temp_y)
-            _radius = min(MAX_RADIUS, min(center_start_distance, center_end_distance))
+            center_start_distance = self._start.distance(temp_point)
+            center_end_distance = self._end.distance(temp_point)
+            _radius = min(constant.MAX_RADIUS, min(center_start_distance, center_end_distance))
 
             # random radius
-            temp_radius = random.randint(min(MIN_RADIUS,int(_radius)), int(_radius))
+            temp_radius = random.randint(min(constant.MIN_RADIUS, int(_radius)), int(_radius))
 
             # random number of dots in the iceberg, (min 3)
-            temp_dots = random.randint(MIN_DOTS, MAX_DOTS)
+            temp_dots = random.randint(constant.MIN_DOTS, constant.MAX_DOTS)
 
             # get random dots using random_point function
-            temp_rnd_point = random_point(x_center=temp_x, y_center=temp_y, radius=temp_radius,
-                                          dots=temp_dots)  # random dots coordinate
+            temp_rnd_point = self._random_points(center_point=temp_point, radius=temp_radius,
+                                                 dots=temp_dots)  # random dots coordinate
 
-            # checking that all point in the field (0 to size) - if not fix (0 or size)
-            for dot in temp_rnd_point:
-                dot[0] = min(dot[0], self._size-1)
-                dot[1] = min(dot[1], self._size-1)
-                dot[0] = max(dot[0], 0)
-                dot[1] = max(dot[1], 0)
-                self._polygons[counter].append(tuple(dot))
+            polygons[polygon] = temp_rnd_point
 
-            # add to polygons text
-            points = "\n".join([" ".join(item) for item in temp_rnd_point.astype(str)])
-            polygons_text += f"\n{counter + 1}\n{temp_dots}\n{points}"
+        return polygons
 
-        return polygons_text
+    def _random_points(self, center_point: Point, radius: float, dots: int) -> list[Point]:
+        """
+        generate random points for each polygon. (using rejection sampling method - 78.5% success)
+        """
 
-    def _convex_hull(self):
+        rnd_points = []
+
+        for i in range(dots):
+            while True:
+                _x = random.random() * radius * 2 - radius
+                _y = random.random() * radius * 2 - radius
+                if _x * _x + _y * _y < (radius * radius):  # check correctness of the coordinate
+                    _x = min(center_point.x + _x, self._size - 1)
+                    _y = min(center_point.y + _y, self._size - 1)
+                    rnd_points.append(Point(_x, _y))
+                    break
+        return rnd_points
+
+    def _convex_hull(self) -> list[list]:
+        ch_polygons = [[] for _ in range(self._ice_num)]
         for polygon in range(self._ice_num):
-            self._convex_hull_polygons[polygon] = ConvexHull(self._polygons[polygon]).hull
+            ch_polygons[polygon] = ConvexHull(self._polygons[polygon]).hull
+        return ch_polygons
 
-    def get_field(self):
-        return self._size, self._size, self._start, self._end, self._ice_num, self._polygons, self._convex_hull_polygons
-
-    def get_convexhull_polygons(self):
-        return self._convex_hull_polygons
+    def get_convexhull_polygons(self) -> list[list]:
+        return self._convex_hull

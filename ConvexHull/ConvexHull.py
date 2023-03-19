@@ -1,5 +1,5 @@
 import math
-from ConvexHull.Point import Point
+from Point.Point import Point
 
 
 def check_input(points):
@@ -15,12 +15,8 @@ def check_input(points):
 # Define the ConvexHull Class
 
 class ConvexHull:
-    def __init__(self, points):
-        check_input(points)  # check input
-        self.points = []
-        for point in points:  # from list of tuple to list op Points
-
-            self.points.append(Point(point[0], point[1]))
+    def __init__(self, points: list[Point]):
+        self.points = points
         self.hull = self.graham_scan()
 
     def graham_scan(self):
@@ -40,9 +36,6 @@ class ConvexHull:
             while len(hull) >= 2 and orientation(hull[-2], hull[-1], sorted_points[i]) != 2:
                 hull.pop()
             hull.append(sorted_points[i])
-
-        # convert to list of tuple [(x,y),(x,y),(x,y)...]
-        hull = [(p.x, p.y) for p in hull]
 
         # special case - all vertex on the same line - the convexHull is only 2 point - add 3rd point
         if len(hull) == 2:
