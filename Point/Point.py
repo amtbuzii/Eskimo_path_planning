@@ -33,3 +33,9 @@ class Point:
 
     def distance(self, other) -> float:
         return round(sqrt((self.x - other.x) ** 2 + (self.y - other.y) ** 2), 2)
+
+    def check_valid(self, low: float, high: float) -> bool:
+        if self.x < low or self.x > high or self.y < low or self.y > high:
+            return False
+        return True
+

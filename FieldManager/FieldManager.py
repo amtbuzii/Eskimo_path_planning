@@ -18,25 +18,20 @@ class FieldManager:
 
         if size <= 0:
             raise ValueError('field size must be greater than 0')
+
         self._size = size
-
-        if not self._check_input(start) or not self._check_input(end):
-            raise ValueError('invalid coordinate')
-
         self._start = start
         self._end = end
+
+        if not self._start.check_valid(0, self._size) or not self._end.check_valid(0, self._size):
+            raise ValueError('invalid coordinate')
+
         self._ice_num = random.randint(1, constant.MAX_ICEBERGS)
         self._polygons = self._create_polygons()  # write the polygons to string and show them in plot
         self._convex_hull = self._convex_hull()
 
         self.field_parameters = Field(self._size, self._start, self._end, self._polygons)
         fh.create_file(self.field_parameters)
-
-    def _check_input(self, point: Point):
-        # check start point
-        if point.x < 0 or point.x > self._size or point.y < 0 or point.y > self._size:
-            return False
-        return True
 
     def _create_polygons(self) -> list[list]:
         """
