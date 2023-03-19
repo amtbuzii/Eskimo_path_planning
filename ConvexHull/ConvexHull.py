@@ -1,5 +1,6 @@
 import math
 from Point.Point import Point
+import logging
 
 
 # Define the ConvexHull Class
@@ -12,6 +13,7 @@ class ConvexHull:
 
     def check_input(self) -> None:
         if len(self.points) < 3:  # check validity of the inputs
+            logging.warning('need at least 3 dots')
             raise ValueError('need at least 3 dots')
 
     def graham_scan(self) -> list[Point]:

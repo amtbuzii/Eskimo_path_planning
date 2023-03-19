@@ -1,5 +1,6 @@
 import itertools
 import shapely
+from shapely import LineString
 from shapely.geometry import Point, LineString, Polygon, mapping
 import matplotlib.pyplot as plt
 from ConvexHull.ConvexHull import ConvexHull
@@ -9,6 +10,24 @@ from itertools import combinations
 from shapely.ops import unary_union
 from Point import Point
 from math import sqrt
+import logging
+
+
+def line_intersection(line1, line2):
+    xdiff = (line1[0][0] - line1[1][0], line2[0][0] - line2[1][0])
+    ydiff = (line1[0][1] - line1[1][1], line2[0][1] - line2[1][1])
+
+    def det(a, b):
+        return a[0] * b[1] - a[1] * b[0]
+
+    div = det(xdiff, ydiff)
+    if div == 0:
+       raise Exception('lines do not intersect')
+
+    d = (det(*line1), det(*line2))
+    x = det(d, xdiff) / div
+    y = det(d, ydiff) / div
+    return x, y
 
 
 def line_crosses_convex_shape(start_point: tuple[float, float], end_point: tuple[float, float],
@@ -82,6 +101,7 @@ class GraphCreator:
             self._union_convex
             self._optimal_graph
         else:
+            logging.warning('invalid graph type (naive or optimal')
             raise ValueError('invalid graph type (naive or optimal')
 
     @property
@@ -150,7 +170,7 @@ class GraphCreator:
         for p in self._polygons:
             polygon = Polygon(p)
             if (polygon.contains(shapely.geometry.Point(self._start))) or (polygon.contains(shapely.geometry.Point(self._end))):
-                print("No optimal solution")
+                logging.debug('No optimal solution')
                 exit()
 
         self._polygons_center = self._polygons_center_calc
@@ -181,9 +201,7 @@ class GraphCreator:
         create optimal graph recursively.
         only vertexes in the relevant direction.
         """
-
         direct_line = True  # if it is possible to get from start_vertex to end point
-
         _relevant_polygons = dict()
         same_polygon = False
         for index, polygon in enumerate(self._polygons):
@@ -195,18 +213,30 @@ class GraphCreator:
                 else:
                     center_point = self._polygons_center[index]
                     _relevant_polygons[index] = distance(start_vertex, center_point)
-
         if not direct_line:  # there isn't direct line between start_vertex to end
             if same_polygon:
                 p = self._polygons[index]
             else:
                 p = self._polygons[min(_relevant_polygons, key=_relevant_polygons.get)]
+
             ch = get_2_points(start_vertex, self._end, p)
+            connect = False
             for vertex in ch:
                 if self._add_edge_to_graph(start_vertex, vertex):
+                    connect = True
                     found = any(vertex == edge[0] for edge in self._graph.edges)
                     if not found:
                         self._rec_optimal_graph(vertex)
+# 231 to 240 need to correct
+            if not connect:
+                polygon = Polygon(p)
+                line = LineString([start_vertex, self._end])
+                coords = list(line.intersection(polygon).coords)
+                avg_vertex = coords[0]
+                if self._add_edge_to_graph(start_vertex, avg_vertex):
+                    inx = self._polygons.index(p)
+                    self._polygons[inx].append(avg_vertex)
+                    self._rec_optimal_graph(avg_vertex)
 
         else:  # there is direct line between start_vertex to end
             self._add_edge_to_graph(start_vertex, self._end)
@@ -240,7 +270,7 @@ class GraphCreator:
         for i, p in enumerate(self._polygons):
             polygon1 = Polygon(p)
             x, y = polygon1.exterior.xy
-            plt.plot(x, y)
+            plt.plot(x, y, label = i)
 
         # figure title
         fig.suptitle("Eskimo field", fontsize=15)
