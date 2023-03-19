@@ -14,6 +14,7 @@ def main():
     start_point = Point(5, 5)
     end_point = Point(field_size - 10, field_size - 10)
     rand_seed = 99
+    print(field_size)
 
     # Step 2: Start the program - create the field and write to file
     field_m = FieldManager(size=field_size, start=start_point, end=end_point, seed=rand_seed)
@@ -28,11 +29,11 @@ def main():
 
     # Step 5 - Create naive Graph
     gc = GraphCreator(test_field)
-    #start_time = time.time()
-    #gc.create_graph(graph_type="naive")
-    #print("naive length: ", gc.shortest_path())
-    #print("naive time: ", time.time() - start_time)
-    #gc.draw_graph()
+    start_time = time.time()
+    gc.create_graph(graph_type="naive")
+    print("naive length: ", gc.shortest_path())
+    print("naive time: ", time.time() - start_time)
+    gc.draw_graph()
 
     # Step 6 - Create optimal Graph
     start_time = time.time()
