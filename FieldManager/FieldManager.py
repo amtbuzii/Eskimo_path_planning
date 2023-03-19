@@ -1,3 +1,4 @@
+import logging
 import random
 import numpy as np
 import math
@@ -6,6 +7,8 @@ import constant
 from Point.Point import Point
 import FileHandler.FileHandler as fh
 from FieldManager.Field import Field
+import logging
+
 
 
 class FieldManager:
@@ -17,6 +20,7 @@ class FieldManager:
         random.seed(seed)
 
         if size <= 0:
+            logging.warning('field size must be greater than 0')
             raise ValueError('field size must be greater than 0')
 
         self._size = size
@@ -24,6 +28,7 @@ class FieldManager:
         self._end = end
 
         if not self._start.check_valid(0, self._size) or not self._end.check_valid(0, self._size):
+            logging.warning('invalid coordinate')
             raise ValueError('invalid coordinate')
 
         self._ice_num = random.randint(1, constant.MAX_ICEBERGS)
