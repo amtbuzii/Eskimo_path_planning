@@ -76,14 +76,15 @@ class GraphCreator:
         self._short_path = None
 
         if graph_type == "naive":
-            self._union_not_convex()
-            self._naive_graph()
+            self._union_not_convex
+            self._naive_graph
         elif graph_type == "optimal":
-            self._union_convex()
-            self._optimal_graph()
+            self._union_convex
+            self._optimal_graph
         else:
             raise ValueError('invalid graph type (naive or optimal')
 
+    @property
     def _union_not_convex(self) -> None:
         """
         union crosses convexes shape to new NOT convex shape - relevant only for naive solution.
@@ -101,10 +102,11 @@ class GraphCreator:
                 self._polygons.append(new_convex)
                 self._polygons.remove(poly_a)
                 self._polygons.remove(poly_b)
-                self._union_not_convex()
+                self._union_not_convex
                 return
         return
 
+    @property
     def _naive_graph(self) -> nx.Graph:
         """
         create a naive graph.
@@ -139,6 +141,7 @@ class GraphCreator:
             return True
         return False
 
+    @property
     def _optimal_graph(self) -> None:
         """
         create optimal graph (using recursive function - self._rec_optimal_graph
@@ -153,6 +156,7 @@ class GraphCreator:
         self._polygons_center = self._polygons_center_calc
         self._rec_optimal_graph(self._start)
 
+    @property
     def _union_convex(self) -> None:
         """
         union crosses convexes shape to new convex shape - relevant to optimal solution.
@@ -168,7 +172,7 @@ class GraphCreator:
                 self._polygons.append([pt.to_tuple() for pt in new_convex])
                 self._polygons.remove(poly_a)
                 self._polygons.remove(poly_b)
-                self._union_convex()
+                self._union_convex
                 return
         return
 
@@ -228,7 +232,7 @@ class GraphCreator:
         self._short_path = nx.single_source_dijkstra(self._graph, self._start, self._end, weight='weight')
         return self._short_path[0]
 
-    def draw_graph(self, save=False, t=0):
+    def draw_graph(self, save=False, t=0) -> None:
         pos = {point: point for point in self._graph.nodes}
 
         # add axis

@@ -2,24 +2,19 @@ import math
 from Point.Point import Point
 
 
-def check_input(points):
-    if len(points) < 3:  # check validity of the inputs
-        raise ValueError('need at least 3 dots')
-    for point in points:  # from list of tuple to list op Points
-        if len(point) != 2:  # check validity of the inputs
-            raise ValueError('need 2 parameters')
-        elif not isinstance(point[0], (int, float)) or not isinstance(point[1], (int, float)):
-            raise ValueError('only numbers')
-
-
 # Define the ConvexHull Class
 
 class ConvexHull:
     def __init__(self, points: list[Point]):
         self.points = points
+        self.check_input()
         self.hull = self.graham_scan()
 
-    def graham_scan(self):
+    def check_input(self) -> None:
+        if len(self.points) < 3:  # check validity of the inputs
+            raise ValueError('need at least 3 dots')
+
+    def graham_scan(self) -> list[Point]:
         """
         Returns the vertices of the convex hull of a set of points using the Graham scan algorithm
         """
@@ -44,7 +39,7 @@ class ConvexHull:
         return hull
 
 
-def orientation(p, q, r):
+def orientation(p: Point, q: Point, r: Point) -> int:
     """
     Returns the orientation of the triplet (p, q, r)
        0 --> p, q and r are colinear
