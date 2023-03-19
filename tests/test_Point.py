@@ -1,4 +1,4 @@
-from ConvexHull.Point import Point
+from Point.Point import Point
 
 def test_eq():
     # test the == operator
