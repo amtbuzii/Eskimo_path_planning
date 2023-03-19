@@ -9,20 +9,21 @@ def random_point(size):
     _y = random.randint(0, size)
     return (_x, _y)
 
-if __name__ == '__main__':
-    '''
-    seed option to show:
-    MAX_RADIUS = 150  # MAX radius size
 
-    - 80 - to movie
-    - 9
-    - 90
-    - 199 - special case
-    - 50 nice
-    - 95 BUG NEED TO UNDERSTAND
-    
-    MAX_RADIUS = 30  # MAX radius size
+def main():
     '''
+       seed option to show:
+       MAX_RADIUS = 150  # MAX radius size
+
+       - 80 - to movie
+       - 9
+       - 90
+       - 199 - special case
+       - 50 nice
+       - 95 BUG NEED TO UNDERSTAND
+
+       MAX_RADIUS = 30  # MAX radius size
+       '''
 
     # Step 1: Field parameters
     field_size = random.randint(100, 600)
@@ -30,7 +31,7 @@ if __name__ == '__main__':
     # start_point = random_point(field_size)
     # end_point = random_point(field_size)
     start_point = (5, 5)
-    end_point = (field_size-10, field_size-10)
+    end_point = (field_size - 10, field_size - 10)
     rand_seed = 99
 
     # Step 2: Start the program - create the field and write to file
@@ -49,7 +50,7 @@ if __name__ == '__main__':
     start_time = time.time()
     gc.create_graph(type="naive")
     print("naive length: ", gc.shortest_path())
-    print("naive time: ", time.time()-start_time)
+    print("naive time: ", time.time() - start_time)
     gc.draw_graph()
 
     # Step 6 - Create optimal Graph
@@ -58,11 +59,16 @@ if __name__ == '__main__':
 
     # Step 7 - Find the Shortest Path
     print("optimal length: ", gc.shortest_path())
-    print("optimal time: ", time.time()-start_time)
+    print("optimal time: ", time.time() - start_time)
     gc.draw_graph()
 
     # Step 8 - Dubins extension
     pass
+
+
+if __name__ == '__main__':
+    main()
+
 
 '''
  frames = []
