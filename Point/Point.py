@@ -4,7 +4,9 @@ from math import sqrt
 
 
 class Point:
-    def __init__(self, x: float = 0, y: float = 0, x_y: tuple[float, float] = None):
+    def __init__(
+        self, x: float = 0, y: float = 0, x_y: tuple[float, float] = None
+    ):
         if x_y is None:
             self.x = x
             self.y = y
@@ -38,4 +40,3 @@ class Point:
         if self.x < low or self.x > high or self.y < low or self.y > high:
             return False
         return True
-

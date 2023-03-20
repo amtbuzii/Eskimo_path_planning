@@ -1,5 +1,6 @@
 from Point.Point import Point
 
+
 def test_Point_eq():
     # test the == operator
     p1 = Point(0, 1)

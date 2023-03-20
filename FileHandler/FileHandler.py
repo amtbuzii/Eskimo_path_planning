@@ -15,24 +15,26 @@ def create_header_text(field: Field) -> str:
     _ice_number = len(field.polygons)
 
     # create the header text
-    header_text = f"{field.size}\n{field.size}\n{field.start}\n{field.end}\n{_ice_number}"
+    header_text = (
+        f"{field.size}\n{field.size}\n{field.start}\n{field.end}\n{_ice_number}"
+    )
 
     return header_text
 
 
 def create_polygons_text(polygons: list) -> str:
-    polygons_text = ''
+    polygons_text = ""
 
     for pol in range(len(polygons)):
         polygon_dots_number = len(polygons[pol])
         # add to polygons text
-        points = "\n".join([point.__str__() for point in polygons[pol]])
+        points = "\n".join([str(point) for point in polygons[pol]])
         polygons_text += f"\n{pol + 1}\n{polygon_dots_number}\n{points}"
 
     return polygons_text
 
 
-def write_to_file(file_name: str, lines: str = '') -> None:
+def write_to_file(file_name: str, lines: str = "") -> None:
     """
     write the data to file.
     """
@@ -41,20 +43,19 @@ def write_to_file(file_name: str, lines: str = '') -> None:
         with open(file_name, "w") as file:
             file.writelines(lines)
     except FileNotFoundError:
-        print("Error: The file was not found.")
+        logging.info("Error: The file was not found.")
     except PermissionError:
-        print("Error: You don't have the required permissions to access the file.")
+        logging.info("Error: You don't have the required permissions to access the file.")
     except OSError as e:
-        print("Error: An operating system error occurred -", e)
+        logging.info("Error: An operating system error occurred -", e)
     except ValueError:
-        print("Error: Invalid value or format.")
+        logging.info("Error: Invalid value or format.")
     except TypeError:
-        print("Error: Invalid data type.")
+        logging.info("Error: Invalid data type.")
     except Exception as e:
-        print("Error: An unexpected error occurred -", e)
+        logging.info("Error: An unexpected error occurred -", e)
     else:
-        logging.info('The data was successfully written to the file.')
-
+        logging.info("The data was successfully written to the file.")
 
 
 def read_field(file_name: str) -> Field:
@@ -62,13 +63,11 @@ def read_field(file_name: str) -> Field:
     read txt file and returns - start, end, polygons
     """
 
-    file = open(file_name, 'r')
+    file = open(file_name, "r")
     size_x = float(file.readline())
     size_y = float(file.readline())
-    start = tuple(map(float, file.readline().split(' ')))
-    start = Point(start[0], start[1])
-    end = tuple(map(float, file.readline().split(' ')))
-    end = Point(end[0], end[1])
+    start = Point(x_y=tuple(map(float, file.readline().split(" "))))
+    end = Point(x_y=tuple(map(float, file.readline().split(" "))))
     ice_num = int(file.readline())
     polygons = [[] for _ in range(ice_num)]
 
@@ -77,11 +76,11 @@ def read_field(file_name: str) -> Field:
         iceberg_num = int(file.readline())
         ice_dots = int(file.readline())
         for dot in range(ice_dots):
-            point = tuple(map(float, file.readline().split(' ')))
+            point = tuple(map(float, file.readline().split(" ")))
             polygons[polygon].append(Point(point[0], point[1]))
 
     file.close()
-    logging.info('The data was successfully read from  file.')
+    logging.info("The data was successfully read from file.")
 
     return Field(size_x, start, end, polygons)
 
@@ -96,8 +95,22 @@ def show_field(field_data: Field, convex: bool) -> None:
     # plt.suptitle("Eskimo field", fontsize=15)
 
     # plot START + END point
-    plt.scatter(field_data.start.x, field_data.start.y, color="blue", marker="p", s=50, label="Start")
-    plt.scatter(field_data.end.x, field_data.end.y, color="red", marker="*", s=50, label="End")
+    plt.scatter(
+        field_data.start.x,
+        field_data.start.y,
+        color="blue",
+        marker="p",
+        s=50,
+        label="Start",
+    )
+    plt.scatter(
+        field_data.end.x,
+        field_data.end.y,
+        color="red",
+        marker="*",
+        s=50,
+        label="End",
+    )
 
     # Plot polygons:
     for polygon in field_data.polygons:
@@ -114,5 +127,5 @@ def show_field(field_data: Field, convex: bool) -> None:
     # plt.ylim(-5,field_data.size)
 
     # grid configurations
-    plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=5)
+    plt.legend(loc="upper center", bbox_to_anchor=(0.5, -0.05), ncol=5)
     plt.show()
