@@ -12,7 +12,7 @@ logging.basicConfig(filename='test.log', level=logging.INFO, format='%(asctime)s
 def main():
     # Step 1: Field parameters
     field_size = random.randint(100, 600)
-    # field_size = 231 - need to correct
+    # field_size = 110
     start_point = Point(5, 5)
     end_point = Point(field_size - 10, field_size - 10)
     rand_seed = 99

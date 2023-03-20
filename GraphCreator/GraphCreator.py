@@ -169,8 +169,9 @@ class GraphCreator:
 
         for p in self._polygons:
             polygon = Polygon(p)
-            if (polygon.contains(shapely.geometry.Point(self._start))) or (polygon.contains(shapely.geometry.Point(self._end))):
-                logging.debug('No optimal solution')
+            if (polygon.contains(shapely.geometry.Point(self._start))) or \
+                    (polygon.contains(shapely.geometry.Point(self._end))):
+                logging.info('No optimal solution - start/end point inside convex shape, try naive way')
                 exit()
 
         self._polygons_center = self._polygons_center_calc
@@ -218,26 +219,12 @@ class GraphCreator:
                 p = self._polygons[index]
             else:
                 p = self._polygons[min(_relevant_polygons, key=_relevant_polygons.get)]
-
             ch = get_2_points(start_vertex, self._end, p)
-            connect = False
             for vertex in ch:
                 if self._add_edge_to_graph(start_vertex, vertex):
-                    connect = True
                     found = any(vertex == edge[0] for edge in self._graph.edges)
                     if not found:
                         self._rec_optimal_graph(vertex)
-# 231 to 240 need to correct
-            if not connect:
-                polygon = Polygon(p)
-                line = LineString([start_vertex, self._end])
-                coords = list(line.intersection(polygon).coords)
-                avg_vertex = coords[0]
-                if self._add_edge_to_graph(start_vertex, avg_vertex):
-                    inx = self._polygons.index(p)
-                    self._polygons[inx].append(avg_vertex)
-                    self._rec_optimal_graph(avg_vertex)
-
         else:  # there is direct line between start_vertex to end
             self._add_edge_to_graph(start_vertex, self._end)
             return
@@ -259,8 +246,12 @@ class GraphCreator:
         return polygons_dict
 
     def shortest_path(self) -> nx.Graph:
-        self._short_path = nx.single_source_dijkstra(self._graph, self._start, self._end, weight='weight')
-        return self._short_path[0]
+        try:
+            self._short_path = nx.single_source_dijkstra(self._graph, self._start, self._end, weight='weight')
+            return self._short_path[0]
+
+        except nx.exception.NodeNotFound:
+            logging.warning('No Path found, try naive way.')
 
     def draw_graph(self, save=False, t=0) -> None:
         pos = {point: point for point in self._graph.nodes}
