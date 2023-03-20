@@ -80,26 +80,41 @@
     - Using networkx library.
     - 2 option to create graph:
       - Naive ++ way- using all the grid (size*size)
-      ## Naive way: all vertexes available
-        - Union of the polygons that touch each other. (**not convex** shape)
-        - Connect all points in the field. (need to check if possible to connect)
+      ## Naive way: 
+        ### all vertexes available
+        1. Union of the polygons that touch each other. (**not convex** shape)
+        2. Connect all points in the field. (need to check if possible to connect)
         ![img.png](project_data/naive.png)
       
-      ## Optimal way:  create graph only with the relevant convex shape.
+      ## Optimal way:
+        ### create graph only with the relevant convex shape.
         1. Union of the polygons that touch each other. (**convex** shape)
         2. If start/end point inside the union polygons - go to naive solution...
         3. Recursive_algorithm(start_point):
-          - If a straight line can be connected between the point and the end - done.
-          - else:
-            - p = Find the polygon that is between the start point and the end point.
-            - Do ConvexHull(start, end, p)
-            - s_left, s_right = 2 points on the new polygon that are on either side of the starting point.
-            - Recursive_algorithm(s_left)
-            - Recursive_algorithm(s_right)
+           - If a straight line can be connected between the point and the end:
+             - Done.
+           - else:
+             - p = Find the polygon that is between the start point and the end point.
+             - Do ConvexHull(start, end, p)
+             - s_left, s_right = 2 points on the new polygon that are on either side of the starting point.
+             - Recursive_algorithm(s_left)
+             - Recursive_algorithm(s_right)
            
       **Example GIF**
+  ![img.png](project_data/example_gif.gif)
+
+      ## Random way:
+        ### create graph randomly. (RRT / RRT*)
+        1. Union of the polygons that touch each other. (**not convex** shape)
+        2. Loop K time: 
+           - Generate random point.
+           - Find the neighbors for this point. (order list)
+           - create new node between the closet neighbor to the random point. (step size)
+           - if reach to target (or close to it):
+             - Done.
+        ![img.png](project_data/random_graph.png)
     
-      ![img.png](project_data/example_gif.gif)
+    
     
   - **Step 2:**
     - Solve the path planning algorithm on this graph (A*, Dijkstra, etc.)
