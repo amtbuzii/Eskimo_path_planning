@@ -1,4 +1,5 @@
 from Point.Point import Point
+
 # declare constants
 
 # field parameters
@@ -14,7 +15,3 @@ MIN_DOTS = 3  # min dots in each icebergs
 MAX_DOTS = 10  # max dots in each icebergs
 MIN_RADIUS = 15  # MIN radius size
 MAX_RADIUS = 25  # MAX radius size
-
-
-
-

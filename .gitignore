@@ -7,6 +7,7 @@ __pycache__/
 # C extensions
 *.so
 code4me.py
+.pre-commit-config.yaml
 
 # Distribution / packaging
 .Python
