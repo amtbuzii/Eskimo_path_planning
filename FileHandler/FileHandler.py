@@ -1,9 +1,8 @@
-from FieldManager.Field import Field
-import numpy as np
 import matplotlib.pyplot as plt
 from FieldManager.Field import Field
 from Point.Point import Point
 import constant
+import logging
 
 
 def create_file(field: Field) -> None:
@@ -54,7 +53,8 @@ def write_to_file(file_name: str, lines: str = '') -> None:
     except Exception as e:
         print("Error: An unexpected error occurred -", e)
     else:
-        print("The data was successfully written to the file.")
+        logging.info('The data was successfully written to the file.')
+
 
 
 def read_field(file_name: str) -> Field:
@@ -81,6 +81,7 @@ def read_field(file_name: str) -> Field:
             polygons[polygon].append(Point(point[0], point[1]))
 
     file.close()
+    logging.info('The data was successfully read from  file.')
 
     return Field(size_x, start, end, polygons)
 
