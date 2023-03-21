@@ -66,8 +66,8 @@ def read_field(file_name: str) -> Field:
     file = open(file_name, "r")
     size_x = float(file.readline())
     size_y = float(file.readline())
-    start = Point(x_y=tuple(map(float, file.readline().split(" "))))
-    end = Point(x_y=tuple(map(float, file.readline().split(" "))))
+    start = Point(tuple(map(float, file.readline().split(" "))))
+    end = Point(tuple(map(float, file.readline().split(" "))))
     ice_num = int(file.readline())
     polygons = [[] for _ in range(ice_num)]
 
