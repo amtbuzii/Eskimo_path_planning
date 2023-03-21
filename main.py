@@ -22,6 +22,8 @@ def main():
     rand_seed = random.randint(0, 600)
     #rand_seed = 207 #nice example to show
     # rand_seed = 422 example to how to choose random point
+    rand_seed = 34
+
 
     # Step 2: Start the program - create the field and write to file
     field_m = FieldManager(

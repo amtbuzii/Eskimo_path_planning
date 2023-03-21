@@ -1,18 +1,18 @@
 # Define the Point class
 
 from math import sqrt
+from typing import Union
 
 
 class Point:
     def __init__(
-        self, x: float = 0, y: float = 0, x_y: tuple[float, float] = None
-    ):
-        if x_y is None:
+            self, x: Union[float, tuple[float, float]], y: float = 0):
+        if isinstance(x, tuple):
+            self.x = x[0]
+            self.y = x[1]
+        else:
             self.x = x
             self.y = y
-        else:
-            self.x = x_y[0]
-            self.y = x_y[1]
 
     def __lt__(self, other):
         if self.y < other.y:

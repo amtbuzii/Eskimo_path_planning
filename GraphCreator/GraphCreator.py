@@ -80,9 +80,9 @@ def get_2_points(
     this function do convex hull for exist convex shape, with 2 points.
     return - the 2 neighbors points to vertex_a.
     """
-    convex_shape = [Point.Point(x_y=pt) for pt in convex_shape]
-    vertex_a = Point.Point(x_y=vertex_a)
-    vertex_b = Point.Point(x_y=vertex_b)
+    convex_shape = [Point.Point(pt) for pt in convex_shape]
+    vertex_a = Point.Point(vertex_a)
+    vertex_b = Point.Point(vertex_b)
     new_convex = ConvexHull(convex_shape + [vertex_a, vertex_b]).graham_scan()
     start_index = new_convex.index(vertex_a)
 
@@ -224,8 +224,8 @@ class GraphCreator:
         pair_polygons = itertools.combinations(self._polygons, 2)
         for poly_a, poly_b in pair_polygons:
             if Polygon(poly_a).intersects(Polygon(poly_b)):
-                temp_a = [Point.Point(x_y=pt) for pt in poly_a]
-                temp_b = [Point.Point(x_y=pt) for pt in poly_b]
+                temp_a = [Point.Point(pt) for pt in poly_a]
+                temp_b = [Point.Point(pt) for pt in poly_b]
                 new_convex = ConvexHull(temp_a + temp_b).graham_scan()
                 self._polygons.append([pt.to_tuple() for pt in new_convex])
                 self._polygons.remove(poly_a)
@@ -274,18 +274,10 @@ class GraphCreator:
             self._add_edge_to_graph(start_vertex, self._end)
             return
 
-    def _collision_detector(self, vertex: tuple[float, float]) -> bool:
-        new_vertex = shapely.Point(vertex)
-        for polygon in self._polygons:
-            poly = Polygon(polygon)
-            if poly.contains(new_vertex):
-                return True
-        return False
-
     def _get_random_point(self) -> tuple[float, float]:
         #while True:
-        _x = random.uniform(0, self._field.size)
-        _y = random.uniform(0, self._field.size)
+        _x = random.uniform(self._start[0]-100.0, self._field.size)
+        _y = random.uniform(self._start[1]-100.0, self._field.size)
             #if not self._collision_detector((_x, _y)):
         return _x, _y
 
@@ -300,18 +292,25 @@ class GraphCreator:
         """
         create random graph (using recursive function - self._rec_optimal_graph
         """
-        n_iter = 350
+        n_iter = 900
+        random.seed(random.randint(0, 1555))
         self._graph.add_node(self._start)
         for _ in range(n_iter):
             random_vertex = self._get_random_point()
             neighbors = self._find_neighbors(random_vertex)
             for node in neighbors:
+                #new_node = random_vertex
+                #if not self._add_edge_to_graph(node, new_node):
                 new_node = step_point(node, random_vertex, 3)
                 if self._add_edge_to_graph(node, new_node):
-                    #if self._add_edge_to_graph(new_node, self._end):
-                     #   logging.info("RTT iterations: {}".format(_))
-                      #  return
                     break
+                #else:
+                 #   break
+            #if self._add_edge_to_graph(new_node, self._end):
+             #   print("bla")
+              #  logging.info("RTT iterations: {}".format(_))
+               # return
+
 
         neighbors = self._find_neighbors(self._end)
         for node in neighbors:
