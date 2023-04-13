@@ -10,8 +10,9 @@ DEAFULT_END = Point(1.0, 1.0)
 FILE_PATH = "../Eskimo_path_planning/data_cpp.txt"
 
 # icebergs parameters
-MAX_ICEBERGS = 6  # maximum number of icebergs should be 70
+MIN_ICEBERGS = 3 # minimum number of icebergs should be 70
+MAX_ICEBERGS = 5  # maximum number of icebergs should be 70
 MIN_DOTS = 3  # min dots in each icebergs
 MAX_DOTS = 10  # max dots in each icebergs
-MIN_RADIUS = 40  # MIN radius size
+MIN_RADIUS = 60  # MIN radius size
 MAX_RADIUS = 70  # MAX radius size - should be 45

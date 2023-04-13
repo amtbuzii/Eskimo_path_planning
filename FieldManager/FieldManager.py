@@ -37,7 +37,7 @@ class FieldManager:
             logging.warning("invalid coordinate")
             raise ValueError("invalid coordinate")
 
-        self._ice_num = random.randint(1, constant.MAX_ICEBERGS)
+        self._ice_num = random.randint(constant.MIN_ICEBERGS, constant.MAX_ICEBERGS)
         self._polygons = (
             self._create_polygons()
         )  # write the polygons to string and show them in plot
