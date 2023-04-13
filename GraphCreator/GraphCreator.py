@@ -11,6 +11,7 @@ from itertools import combinations
 from shapely.ops import unary_union
 from Point import Point
 from math import sqrt
+from Dubins import Dubins
 import logging
 
 
@@ -113,6 +114,7 @@ class GraphCreator:
         self._polygons = None
         self._polygons_center = None
         self._short_path = None
+        self._dubins_path = None
 
     def create_graph(self, graph_type: str = "naive") -> None:
         self._graph = nx.Graph()
@@ -319,6 +321,44 @@ class GraphCreator:
 
         return
 
+    def dubins_graph(self, vel: float = 50, phi: float = 10) -> None:
+        """
+        create dubins graph
+        """
+
+        xx, yy = Dubins.create_dubins_path(self._short_path[1], vel=vel, phi=phi)
+
+        fig, ax = plt.subplots()
+        for i, p in enumerate(self._polygons):
+            polygon1 = Polygon(p)
+            x, y = polygon1.exterior.xy
+            plt.plot(x, y)
+
+        # plot START + END point
+        ax.scatter(
+            self._start[0],
+            self._start[1],
+            color="blue",
+            marker="p",
+            s=50,
+            label="Start",
+        )
+        ax.scatter(
+            self._end[0],
+            self._end[1],
+            color="red",
+            marker="*",
+            s=50,
+            label="End",
+        )
+        plt.scatter(xx, yy, s=0.1, color = "gold")
+
+        # grid configurations
+        plt.axis("on")
+        ax.tick_params(left=True, bottom=True, labelleft=True, labelbottom=True)
+        ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.05), ncol=5)
+        plt.show()
+
     @property
     def _polygons_center_calc(self) -> dict[int, tuple]:
         """
@@ -358,7 +398,7 @@ class GraphCreator:
             plt.plot(x, y)
 
         # figure title
-        #fig.suptitle("Eskimo field", fontsize=15)
+        fig.suptitle("Eskimo field", fontsize=15)
 
         nx.draw(
             self._graph, pos=pos, node_size=15, ax=ax
