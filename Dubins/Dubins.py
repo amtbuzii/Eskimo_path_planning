@@ -302,34 +302,3 @@ def create_dubins_path(points: list[tuple[float, float]], vel: float, phi: float
         i += 1
     return xx, yy
 
-
-def main():
-    # User's waypoints: [x, y, heading (degrees)]
-    pt1 = Waypoint(0, 0, 0)
-    pt2 = Waypoint(10, 10, 270)
-    # pt3 = Waypoint(1000,15000,180)
-    # pt4 = Waypoint(0,0,270)
-    Wptz = [pt1, pt2]
-    # Run the code
-    i = 0
-    while i < len(Wptz) - 1:
-        print(i)
-        param = calcDubinsPath(Wptz[i], Wptz[i + 1], vel=90, phi_lim=20)
-        path = dubins_traj(param=param, step=1)
-
-        # Plot the results
-        plt.plot(Wptz[i].x, Wptz[i].y, 'kx')
-        plt.plot(Wptz[i + 1].x, Wptz[i + 1].y, 'kx')
-        plt.scatter(path[:, 0], path[:, 1], s=0.1)
-        i += 1
-    plt.grid(True)
-
-    plt.axis("equal")
-    plt.title('Dubin\'s Curves Trajectory Generation')
-    plt.xlabel('X')
-    plt.ylabel('Y')
-    plt.show()
-
-
-if __name__ == '__main__':
-    main()
