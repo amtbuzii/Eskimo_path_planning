@@ -1,9 +1,9 @@
 import itertools
 import random
 import shapely
-from shapely import LineString
 from shapely.geometry import Point, LineString, Polygon, mapping
 import matplotlib.pyplot as plt
+import constant
 from ConvexHull.ConvexHull import ConvexHull
 import networkx as nx
 from FieldManager.Field import Field
@@ -294,7 +294,7 @@ class GraphCreator:
         """
         create random graph (using recursive function - self._rec_optimal_graph
         """
-        n_iter = 900
+        n_iter = constant.ITERATION
         random.seed(random.randint(0, 1555))
         self._graph.add_node(self._start)
         for _ in range(n_iter):
@@ -303,7 +303,7 @@ class GraphCreator:
             for node in neighbors:
                 #new_node = random_vertex
                 #if not self._add_edge_to_graph(node, new_node):
-                new_node = step_point(node, random_vertex, 3)
+                new_node = step_point(node, random_vertex, constant.STEP_SIZE)
                 if self._add_edge_to_graph(node, new_node):
                     break
                 #else:

@@ -46,20 +46,20 @@ def wrapTo360(angle: float) -> float:
     return angle
 
 
-def wrapTo180(angle: float) -> float:
+def wrap_to_180(angle: float) -> float:
     q = (angle < -180) or (180 < angle)
     if (q):
         angle = wrapTo360(angle + 180) - 180
     return angle
 
 
-def headingToStandard(hdg: float) -> float:
+def heading_to_standard(hdg: float) -> float:
     # Convert NED heading to standard unit cirlce...degrees only for now (Im lazy)
-    thet = wrapTo360(90 - wrapTo180(hdg))
+    thet = wrapTo360(90 - wrap_to_180(hdg))
     return thet
 
 
-def calcDubinsPath(wpt1: Waypoint, wpt2: Waypoint, vel: float, phi_lim: float) -> Param:
+def calc_dubins_path(wpt1: Waypoint, wpt2: Waypoint, vel: float, phi_lim: float) -> Param:
     # Calculate a dubins path between two waypoints
     param = Param(wpt1, 0, 0)
     tz = [0, 0, 0, 0, 0, 0]
@@ -67,8 +67,8 @@ def calcDubinsPath(wpt1: Waypoint, wpt2: Waypoint, vel: float, phi_lim: float) -
     qz = [0, 0, 0, 0, 0, 0]
     param.seg_final = [0, 0, 0]
     # Convert the headings from NED to standard unit cirlce, and then to radians
-    psi1 = headingToStandard(wpt1.psi) * math.pi / 180
-    psi2 = headingToStandard(wpt2.psi) * math.pi / 180
+    psi1 = heading_to_standard(wpt1.psi) * math.pi / 180
+    psi2 = heading_to_standard(wpt2.psi) * math.pi / 180
 
     # Do math
     param.turn_radius = (vel * vel) / (9.8 * math.tan(phi_lim * math.pi / 180))
@@ -84,13 +84,13 @@ def calcDubinsPath(wpt1: Waypoint, wpt2: Waypoint, vel: float, phi_lim: float) -
     best_word = -1
     best_cost = -1
 
-    # Calculate all dubin's paths between points
-    tz[0], pz[0], qz[0] = dubinsLSL(alpha, beta, d)
-    tz[1], pz[1], qz[1] = dubinsLSR(alpha, beta, d)
-    tz[2], pz[2], qz[2] = dubinsRSL(alpha, beta, d)
-    tz[3], pz[3], qz[3] = dubinsRSR(alpha, beta, d)
-    tz[4], pz[4], qz[4] = dubinsRLR(alpha, beta, d)
-    tz[5], pz[5], qz[5] = dubinsLRL(alpha, beta, d)
+    # Calculate all dubins paths between points
+    tz[0], pz[0], qz[0] = dubins_LSL(alpha, beta, d)
+    tz[1], pz[1], qz[1] = dubins_LSR(alpha, beta, d)
+    tz[2], pz[2], qz[2] = dubins_RSL(alpha, beta, d)
+    tz[3], pz[3], qz[3] = dubins_RSR(alpha, beta, d)
+    tz[4], pz[4], qz[4] = dubins_RLR(alpha, beta, d)
+    tz[5], pz[5], qz[5] = dubins_LRL(alpha, beta, d)
 
     # Now, pick the one with the lowest cost
     for x in range(6):
@@ -106,7 +106,7 @@ def calcDubinsPath(wpt1: Waypoint, wpt2: Waypoint, vel: float, phi_lim: float) -
 
 
 # Here's all of the dubins path math
-def dubinsLSL(alpha: float, beta: float, d: float) -> tuple[float]:
+def dubins_LSL(alpha: float, beta: float, d: float) -> tuple[float]:
     tmp0 = d + math.sin(alpha) - math.sin(beta)
     tmp1 = math.atan2((math.cos(beta) - math.cos(alpha)), tmp0)
     p_squared = 2 + d * d - (2 * math.cos(alpha - beta)) + (2 * d * (math.sin(alpha) - math.sin(beta)))
@@ -122,7 +122,7 @@ def dubinsLSL(alpha: float, beta: float, d: float) -> tuple[float]:
     return t, p, q
 
 
-def dubinsRSR(alpha: float, beta: float, d: float) -> tuple[float]:
+def dubins_RSR(alpha: float, beta: float, d: float) -> tuple[float]:
     tmp0 = d - math.sin(alpha) + math.sin(beta)
     tmp1 = math.atan2((math.cos(alpha) - math.cos(beta)), tmp0)
     p_squared = 2 + d * d - (2 * math.cos(alpha - beta)) + 2 * d * (math.sin(beta) - math.sin(alpha))
@@ -138,7 +138,7 @@ def dubinsRSR(alpha: float, beta: float, d: float) -> tuple[float]:
     return t, p, q
 
 
-def dubinsRSL(alpha: float, beta: float, d: float) -> tuple[float]:
+def dubins_RSL(alpha: float, beta: float, d: float) -> tuple[float]:
     tmp0 = d - math.sin(alpha) - math.sin(beta)
     p_squared = -2 + d * d + 2 * math.cos(alpha - beta) - 2 * d * (math.sin(alpha) + math.sin(beta))
     if p_squared < 0:
@@ -154,7 +154,7 @@ def dubinsRSL(alpha: float, beta: float, d: float) -> tuple[float]:
     return t, p, q
 
 
-def dubinsLSR(alpha: float, beta: float, d: float) -> tuple[float]:
+def dubins_LSR(alpha: float, beta: float, d: float) -> tuple[float]:
     tmp0 = d + math.sin(alpha) + math.sin(beta)
     p_squared = -2 + d * d + 2 * math.cos(alpha - beta) + 2 * d * (math.sin(alpha) + math.sin(beta))
     if p_squared < 0:
@@ -170,7 +170,7 @@ def dubinsLSR(alpha: float, beta: float, d: float) -> tuple[float]:
     return t, p, q
 
 
-def dubinsRLR(alpha: float, beta: float, d: float) -> tuple[float]:
+def dubins_RLR(alpha: float, beta: float, d: float) -> tuple[float]:
     tmp_rlr = (6 - d * d + 2 * math.cos(alpha - beta) + 2 * d * (math.sin(alpha) - math.sin(beta))) / 8
     if (abs(tmp_rlr) > 1):
         print('No RLR Path')
@@ -186,7 +186,7 @@ def dubinsRLR(alpha: float, beta: float, d: float) -> tuple[float]:
     return t, p, q
 
 
-def dubinsLRL(alpha: float, beta: float, d: float) -> tuple[float]:
+def dubins_LRL(alpha: float, beta: float, d: float) -> tuple[float]:
     tmp_lrl = (6 - d * d + 2 * math.cos(alpha - beta) + 2 * d * (-1 * math.sin(alpha) + math.sin(beta))) / 8
     if (abs(tmp_lrl) > 1):
         print('No LRL Path')
@@ -220,7 +220,7 @@ def dubins_traj(param: Param, step: float) -> np.ndarray:
 def dubins_path(param: Param, t: int) -> np.ndarray[float]:
     # Helper function for curve generation
     tprime = t / param.turn_radius
-    p_init = np.array([0, 0, headingToStandard(param.p_init.psi) * math.pi / 180])
+    p_init = np.array([0, 0, heading_to_standard(param.p_init.psi) * math.pi / 180])
     #
     L_SEG = 1
     S_SEG = 2
@@ -294,11 +294,10 @@ def create_dubins_path(points: list[tuple[float, float]], vel: float, phi: float
     total_path = []
     i = 0
     while i < len(wptz) - 1:
-        param = calcDubinsPath(wptz[i], wptz[i + 1], vel=vel, phi_lim=phi)
+        param = calc_dubins_path(wptz[i], wptz[i + 1], vel=vel, phi_lim=phi)
         path = dubins_traj(param=param, step=1)
         total_path.extend(path[:, 0:2])
         xx.extend(path[:, 0])
         yy.extend(path[:, 1])
         i += 1
     return xx, yy
-

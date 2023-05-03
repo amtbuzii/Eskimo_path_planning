@@ -24,16 +24,14 @@ class FieldManager:
         random.seed(seed)
 
         if size <= 0:
-            logging.warning("field size must be greater than 0")
-            raise ValueError("field size must be greater than 0")
+            logging.warning("field size must be greater than 2")
+            raise ValueError("field size must be greater than 2")
 
         self._size = size
         self._start = start
         self._end = end
 
-        if not self._start.check_valid(
-            0, self._size
-        ) or not self._end.check_valid(0, self._size):
+        if not self._start.check_valid(0, self._size) or not self._end.check_valid(0, self._size):
             logging.warning("invalid coordinate")
             raise ValueError("invalid coordinate")
 

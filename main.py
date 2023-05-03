@@ -6,6 +6,8 @@ import random
 import time
 from Point.Point import Point
 import logging
+import numpy as np
+
 
 logging.basicConfig(
     filename="test.log",
@@ -15,15 +17,13 @@ logging.basicConfig(
 
 
 def main():
+
     # Step 1: Field parameters
     field_size = 300
     start_point = Point(5, 5)
     end_point = Point(field_size - 10, field_size - 10)
     rand_seed = random.randint(0, 600)
-    #rand_seed = 207 #nice example to show
-    # rand_seed = 422 example to how to choose random point
-    print(rand_seed)
-    #rand_seed = 214
+
     # Step 2: Start the program - create the field and write to file
     field_m = FieldManager(
         size=field_size, start=start_point, end=end_point, seed=rand_seed
@@ -42,35 +42,39 @@ def main():
 
     gc = GraphCreator(test_field)
 
-    '''
     # Step 5 - Create naive Graph and find the Shortest Path
     start_time = time.time()
     gc.create_graph(graph_type="naive")
-    logging.info("naive length: {}".format(gc.shortest_path()))
-    logging.info("naive time: {}".format(time.time() - start_time))
-    gc.draw_graph()
-    '''
+    naive_length = gc.shortest_path()
+    naive_runtime = time.time() - start_time
+    logging.info("naive length: {}".format(naive_length))
+    logging.info("naive time: {}".format(naive_runtime))
+    #gc.draw_graph()
 
     # Step 6 - Create optimal Graph and find the Shortest Path
     start_time = time.time()
     gc.create_graph(graph_type="optimal")
-    logging.info("optimal length: {}".format(gc.shortest_path()))
-    logging.info("optimal time: {}".format(time.time() - start_time))
-    gc.draw_graph()
+    optimal_length = gc.shortest_path()
+    optimal_runtime = time.time() - start_time
+    logging.info("naive length: {}".format(optimal_length))
+    logging.info("naive time: {}".format(optimal_runtime))
+    #gc.draw_graph()
 
-    '''
     # Step 7 - Create RRT Graph and find the Shortest Path
     start_time = time.time()
     gc.create_graph(graph_type="RRT")
-    gc.draw_graph()
-    logging.info("RRT length: {}".format(gc.shortest_path()))
-    logging.info("RRT time: {}".format(time.time() - start_time))
-    gc.draw_graph()
-    '''
+    random_length = gc.shortest_path()
+    random_runtime = time.time() - start_time
+    logging.info("naive length: {}".format(random_length))
+    logging.info("naive time: {}".format(random_runtime))
+    #gc.draw_graph()
 
-    # Step 7 - Dubins extension
-    gc.dubins_graph(vel=15, phi=17)
 
+    # Step 8 - Dubins extension
+    gc.create_graph(graph_type="optimal")
+    gc.shortest_path()
+    gc.dubins_graph(vel=10, phi=17)
 
 if __name__ == "__main__":
-    main()
+    for i in range(10):
+        main()
