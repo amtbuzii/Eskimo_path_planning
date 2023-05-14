@@ -67,10 +67,11 @@ def main():
     logging.info("RRT time: {}".format(random_runtime))
     gc.draw_graph()
 
+
     # Step 8 - Dubins extension
-    #gc.create_graph(graph_type="optimal")
-    #gc.shortest_path()
-    #gc.dubins_graph(vel=10, phi=17)
+    gc.create_graph(graph_type="optimal")
+    gc.shortest_path()
+    gc.dubins_graph(vel=10, phi=17)
     
 
 
