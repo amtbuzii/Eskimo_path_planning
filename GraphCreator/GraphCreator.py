@@ -139,6 +139,9 @@ class GraphCreator:
         elif graph_type == "RRT":
             self._union_not_convex
             self._random_graph()
+        elif graph_type == "RRT*":
+            self._union_not_convex
+            self._random_graph_RRT_star()
         else:
             logging.warning("invalid graph type (naive / optimal / RRT)")
             raise ValueError("invalid graph type")
@@ -305,7 +308,7 @@ class GraphCreator:
 
     def _random_graph(self) -> None:
         """
-        create random graph (using recursive function - self._rec_optimal_graph
+        create random graph - RRT
         """
         n_iter = constant.ITERATION
         random.seed(random.randint(0, 1555))
@@ -314,25 +317,18 @@ class GraphCreator:
             random_vertex = self._get_random_point()
             neighbors = self._find_neighbors(random_vertex)
             for node in neighbors:
-                # new_node = random_vertex
-                # if not self._add_edge_to_graph(node, new_node):
+
                 new_node = step_point(node, random_vertex, constant.STEP_SIZE)
                 if self._vertex_inside_map(new_node):
                     if self._add_edge_to_graph(node, new_node):
                         break
-                # else:
-                #   break
-            # if self._add_edge_to_graph(new_node, self._end):
-            #   print("bla")
-            #  logging.info("RTT iterations: {}".format(_))
-            # return
 
         neighbors = self._find_neighbors(self._end)
         for node in neighbors:
             if self._add_edge_to_graph(node, self._end):
                 break
-
         return
+
 
     def dubins_graph(self, vel: float = 50, phi: float = 10) -> None:
         """
