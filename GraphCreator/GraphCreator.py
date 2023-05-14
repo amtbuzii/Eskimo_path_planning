@@ -131,13 +131,13 @@ class GraphCreator:
         self._short_path = None
 
         if graph_type == "naive":
-            #self._union_not_convex
+            self._union_not_convex
             self._naive_graph
         elif graph_type == "optimal":
-            #self._union_convex
+            self._union_convex
             self._optimal_graph
         elif graph_type == "RRT":
-            #self._union_not_convex
+            self._union_not_convex
             self._random_graph()
         else:
             logging.warning("invalid graph type (naive / optimal / RRT)")
@@ -226,7 +226,7 @@ class GraphCreator:
                 exit()
 
         self._polygons_center = self._polygons_center_calc
-        self._rec_optimal_graph_2(self._start, self._end)
+        self._rec_optimal_graph(self._start, self._end)
 
     @property
     def _union_convex(self) -> None:
@@ -248,63 +248,6 @@ class GraphCreator:
                 return
         return
 
-    def _rec_optimal_graph(self, start_vertex: tuple[float, float], end_vertex: tuple[float, float]) -> None:
-        """
-        create optimal graph recursively.
-        only vertexes in the relevant direction.
-        """
-        direct_line = (
-            True  # if it is possible to get from start_vertex to end point
-        )
-        poly_inx = self._find_my_polygon(start_vertex)
-        if poly_inx != -1:
-            for next_vertex in self._polygons[poly_inx]:
-                if next_vertex != start_vertex:
-                    line = LineString([start_vertex, end_vertex])
-                    point = shapely.Point(next_vertex)
-                    if line.distance(point) < 1e-8:
-                        self._add_edge_to_graph(start_vertex, next_vertex)
-                        self._rec_optimal_graph(next_vertex, end_vertex)
-
-        _relevant_polygons = dict()
-        same_polygon = False
-        for index, polygon in enumerate(self._polygons):
-            if line_crosses_convex_shape(start_vertex, end_vertex, polygon):
-                direct_line = False
-                if start_vertex in polygon:
-                    same_polygon = True
-                    break
-                else:
-                    center_point = self._polygons_center[index]
-                    _relevant_polygons[index] = distance(
-                        start_vertex, center_point
-                    )
-        if (
-                not direct_line
-        ):  # there isn't direct line between start_vertex to end
-            if same_polygon:
-                p = self._polygons[index]
-            else:
-                p = self._polygons[
-                    min(_relevant_polygons, key=_relevant_polygons.get)
-                ]
-            ch = get_2_points(start_vertex, end_vertex, p)
-            for vertex in ch:
-                next_point = self._add_edge_to_graph(start_vertex, vertex)
-                if next_point == True:
-                    found = any(vertex == edge[0] for edge in self._graph.edges)
-                    if not found:
-                        self._rec_optimal_graph(vertex, end_vertex)
-                else:
-                    next_point_coord = next_point.coords[0]
-                    if not next_point_coord == start_vertex:
-                        self._add_edge_to_graph(start_vertex, next_point_coord)
-                        self._rec_optimal_graph(next_point_coord, end_vertex)
-
-        else:  # there is direct line between start_vertex to end
-            self._add_edge_to_graph(start_vertex, end_vertex)
-            return
-
     def _get_polygon_between_2_points(self, start_vertex: tuple[float, float], end_vertex: tuple[float, float]) -> int:
         """
         return the polygon index if it is between 2 points.
@@ -319,7 +262,7 @@ class GraphCreator:
                 return index
         return -1
 
-    def _rec_optimal_graph_2(self, start_vertex: tuple[float, float], end_vertex: tuple[float, float]) -> None:
+    def _rec_optimal_graph(self, start_vertex: tuple[float, float], end_vertex: tuple[float, float]) -> None:
         """
         create optimal graph recursively.
         only vertexes in the relevant direction.
@@ -335,9 +278,9 @@ class GraphCreator:
             for vertex in next_points:
                 if self._vertex_inside_map(vertex):  # vertex inside the map
                     if (start_vertex, vertex) not in self._graph.edges:
-                        self._rec_optimal_graph_2(start_vertex, vertex)
+                        self._rec_optimal_graph(start_vertex, vertex)
                         if (vertex, end_vertex) not in self._graph.edges:
-                            self._rec_optimal_graph_2(vertex, end_vertex)
+                            self._rec_optimal_graph(vertex, end_vertex)
 
     def _vertex_inside_map(self, vertex: tuple[float, float]) -> bool:
         x, y = vertex

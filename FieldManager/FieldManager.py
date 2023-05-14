@@ -12,11 +12,11 @@ import logging
 
 class FieldManager:
     def __init__(
-        self,
-        size: int = constant.MIN_SIZE,
-        start: Point = constant.DEAFULT_START,
-        end: Point = constant.DEAFULT_END,
-        seed: int = constant.DEAFULT_SEED,
+            self,
+            size: int = constant.MIN_SIZE,
+            start: Point = constant.DEAFULT_START,
+            end: Point = constant.DEAFULT_END,
+            seed: int = constant.DEAFULT_SEED,
     ):
         """
         initialize the object parameters. write to file and draw the field
@@ -50,9 +50,9 @@ class FieldManager:
         """
         create random polygons (icebergs)
         """
-        polygons = [[] for _ in range(self._ice_num-7)]
+        polygons = [[] for _ in range(self._ice_num)]
 
-        for polygon in range(self._ice_num-7):
+        for polygon in range(self._ice_num):
             # random center coordinate
             temp_point = Point(
                 random.randint(0, self._size), random.randint(0, self._size)
@@ -80,7 +80,7 @@ class FieldManager:
             )  # random dots coordinate
             polygons[polygon] = temp_rnd_point
 
-
+        """
         p1 = [Point(20, 0), Point(40, 0), Point(20, 290), Point(40, 290)]
         p2 = [Point(60, 10), Point(80, 10), Point(60, 300), Point(80, 300)]
         p3 = [Point(100, 0), Point(120, 0), Point(100, 290), Point(120, 290)]
@@ -98,13 +98,12 @@ class FieldManager:
         polygons.append(p6)
         polygons.append(p7)
         #polygons.append(p8)
-
-
+        """
 
         return polygons
 
     def _random_points(
-        self, center_point: Point, radius: float, dots: int
+            self, center_point: Point, radius: float, dots: int
     ) -> list[Point]:
         """
         generate random points for each polygon. (using rejection sampling method - 78.5% success)
