@@ -6,8 +6,6 @@ import random
 import time
 from Point.Point import Point
 import logging
-import numpy as np
-
 
 logging.basicConfig(
     filename="test.log",
@@ -21,9 +19,8 @@ def main():
     # Step 1: Field parameters
     field_size = 300
     start_point = Point(5, 5)
-    end_point = Point(field_size - 10,  10)
+    end_point = Point(field_size - 10,  field_size - 10)
     rand_seed = random.randint(0, 600)
-    rand_seed = 168
 
     # Step 2: Start the program - create the field and write to file
     field_m = FieldManager(
@@ -35,11 +32,11 @@ def main():
 
     # Step 3: Read from file and show the field
     test_field = fh.read_field(constant.FILE_PATH)
-    #fh.show_field(test_field, convex=False)
+    fh.show_field(test_field, convex=False)
 
     # Step 4 - Convex Hull
     test_field.polygons = field_m.get_convexhull_polygons()
-    #fh.show_field(test_field, convex=True)
+    fh.show_field(test_field, convex=True)
 
     gc = GraphCreator(test_field)
 
