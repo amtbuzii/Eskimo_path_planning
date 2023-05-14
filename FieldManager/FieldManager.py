@@ -42,7 +42,7 @@ class FieldManager:
         self._convex_hull = self._convex_hull()
 
         self.field_parameters = Field(
-            self._size, self._start, self._end, self._polygons
+            size=self._size, start=self._start, end=self._end, polygons=self._polygons
         )
         fh.create_file(self.field_parameters)
 
@@ -50,9 +50,9 @@ class FieldManager:
         """
         create random polygons (icebergs)
         """
-        polygons = [[] for _ in range(self._ice_num)]
+        polygons = [[] for _ in range(self._ice_num-7)]
 
-        for polygon in range(self._ice_num):
+        for polygon in range(self._ice_num-7):
             # random center coordinate
             temp_point = Point(
                 random.randint(0, self._size), random.randint(0, self._size)
@@ -78,8 +78,28 @@ class FieldManager:
             temp_rnd_point = self._random_points(
                 center_point=temp_point, radius=temp_radius, dots=temp_dots
             )  # random dots coordinate
-
             polygons[polygon] = temp_rnd_point
+
+
+        p1 = [Point(20, 0), Point(40, 0), Point(20, 290), Point(40, 290)]
+        p2 = [Point(60, 10), Point(80, 10), Point(60, 300), Point(80, 300)]
+        p3 = [Point(100, 0), Point(120, 0), Point(100, 290), Point(120, 290)]
+        p4 = [Point(140, 10), Point(160, 10), Point(140, 300), Point(160, 300)]
+        p5 = [Point(180, 0), Point(200, 0), Point(180, 290), Point(200, 290)]
+        p6 = [Point(220, 10), Point(240, 10), Point(220, 300), Point(240, 300)]
+        p7 = [Point(260, 0), Point(280, 0), Point(260, 290), Point(280, 290)]
+        #p8 = [Point(280, 10), Point(160, 10), Point(140, 300), Point(160, 300)]
+
+        polygons.append(p1)
+        polygons.append(p2)
+        polygons.append(p3)
+        polygons.append(p4)
+        polygons.append(p5)
+        polygons.append(p6)
+        polygons.append(p7)
+        #polygons.append(p8)
+
+
 
         return polygons
 

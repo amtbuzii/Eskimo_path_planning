@@ -24,6 +24,7 @@ def step_point(node_a: tuple[float, float], node_b: tuple[float, float], step: f
     new_y = node_a[1] + (step * y_increment)
     return new_x, new_y
 
+
 def line_intersection(line1, line2):
     xdiff = (line1[0][0] - line1[1][0], line2[0][0] - line2[1][0])
     ydiff = (line1[0][1] - line1[1][1], line2[0][1] - line2[1][1])
@@ -42,9 +43,9 @@ def line_intersection(line1, line2):
 
 
 def line_crosses_convex_shape(
-    start_point: tuple[float, float],
-    end_point: tuple[float, float],
-    convex_shape: list[tuple[float, float]],
+        start_point: tuple[float, float],
+        end_point: tuple[float, float],
+        convex_shape: list[tuple[float, float]],
 ) -> bool:
     """
     Check if a line between start_point and end_point crosses a convex_shape.
@@ -52,15 +53,11 @@ def line_crosses_convex_shape(
     """
 
     # Check if points are in the same convex
-    if (
-        (start_point in convex_shape)
-        and (end_point in convex_shape)
-        and (
-            abs(convex_shape.index(start_point) - convex_shape.index(end_point))
-            > 1
-        )
-    ):
-        return True
+
+    if (start_point in convex_shape) and (end_point in convex_shape):
+        dist = abs(convex_shape.index(start_point) - convex_shape.index(end_point))
+        if dist > 1 and dist != len(convex_shape) - 1:
+            return True
 
     # convert the convex shape to a Shapely polygon
     polygon = Polygon(convex_shape)
@@ -69,13 +66,13 @@ def line_crosses_convex_shape(
     line = LineString([start_point, end_point])
 
     # check if the line intersects the polygon
-    return line.crosses(polygon)
+    return line.crosses(polygon) or polygon.contains(line)
 
 
 def get_2_points(
-    vertex_a: tuple[float, float],
-    vertex_b: tuple[float, float],
-    convex_shape: list[tuple[float, float]],
+        vertex_a: tuple[float, float],
+        vertex_b: tuple[float, float],
+        convex_shape: list[tuple[float, float]],
 ) -> tuple[tuple[float, float], tuple[float, float]]:
     """
     this function do convex hull for exist convex shape, with 2 points.
@@ -95,7 +92,7 @@ def get_2_points(
 
 
 def distance(
-    vertex_a: tuple[float, float], vertex_b: tuple[float, float]
+        vertex_a: tuple[float, float], vertex_b: tuple[float, float]
 ) -> float:
     return round(
         sqrt(
@@ -103,6 +100,14 @@ def distance(
         ),
         2,
     )
+
+
+def get_incline(
+        vertex_a: tuple[float, float], vertex_b: tuple[float, float]
+) -> float:
+    if vertex_a[0] == vertex_b[0]:
+        return 0
+    return (vertex_b[1] - vertex_a[1]) / (vertex_b[0] - vertex_a[0])
 
 
 class GraphCreator:
@@ -126,13 +131,13 @@ class GraphCreator:
         self._short_path = None
 
         if graph_type == "naive":
-            self._union_not_convex
+            #self._union_not_convex
             self._naive_graph
         elif graph_type == "optimal":
-            self._union_convex
+            #self._union_convex
             self._optimal_graph
         elif graph_type == "RRT":
-            self._union_not_convex
+            #self._union_not_convex
             self._random_graph()
         else:
             logging.warning("invalid graph type (naive / optimal / RRT)")
@@ -173,24 +178,31 @@ class GraphCreator:
         # All points in one list
         all_points = [self._start, self._end] + sum(self._polygons, [])
 
+        # remove not in the map points
+        all_points = [point for point in all_points if self._vertex_inside_map(point)]
+
         # Get all combinations of points - no return.
         comb = combinations(all_points, 2)
 
-        # For each pair, check if it is possible to create edge.
+        # For each pair, check if it is possible to create edge. (except if the vertexes are equal)
         for vertex_a, vertex_b in list(comb):
-            self._add_edge_to_graph(vertex_a, vertex_b)
+            if vertex_a != vertex_b:
+                self._add_edge_to_graph(vertex_a, vertex_b)
 
         return
 
     def _add_edge_to_graph(
-        self, vertex_a: tuple[float, float], vertex_b: tuple[float, float]
+            self, vertex_a: tuple[float, float], vertex_b: tuple[float, float]
     ) -> bool:
         """
         add edge  between 2 points if it is OK.
         """
         for p in self._polygons:
             if line_crosses_convex_shape(vertex_a, vertex_b, p):
-                return False
+                line1 = LineString([vertex_a, vertex_b])
+                polygon = shapely.Polygon(p)
+                points = polygon.intersection(line1)
+                return points
 
         # it is possible to connect
         weight = distance(vertex_a, vertex_b)
@@ -206,7 +218,7 @@ class GraphCreator:
         for p in self._polygons:
             polygon = Polygon(p)
             if (polygon.contains(shapely.geometry.Point(self._start))) or (
-                polygon.contains(shapely.geometry.Point(self._end))
+                    polygon.contains(shapely.geometry.Point(self._end))
             ):
                 logging.info(
                     "No optimal solution - start/end point inside convex shape, try naive way"
@@ -214,7 +226,7 @@ class GraphCreator:
                 exit()
 
         self._polygons_center = self._polygons_center_calc
-        self._rec_optimal_graph(self._start)
+        self._rec_optimal_graph_2(self._start, self._end)
 
     @property
     def _union_convex(self) -> None:
@@ -236,7 +248,7 @@ class GraphCreator:
                 return
         return
 
-    def _rec_optimal_graph(self, start_vertex: tuple[float, float]) -> None:
+    def _rec_optimal_graph(self, start_vertex: tuple[float, float], end_vertex: tuple[float, float]) -> None:
         """
         create optimal graph recursively.
         only vertexes in the relevant direction.
@@ -244,10 +256,20 @@ class GraphCreator:
         direct_line = (
             True  # if it is possible to get from start_vertex to end point
         )
+        poly_inx = self._find_my_polygon(start_vertex)
+        if poly_inx != -1:
+            for next_vertex in self._polygons[poly_inx]:
+                if next_vertex != start_vertex:
+                    line = LineString([start_vertex, end_vertex])
+                    point = shapely.Point(next_vertex)
+                    if line.distance(point) < 1e-8:
+                        self._add_edge_to_graph(start_vertex, next_vertex)
+                        self._rec_optimal_graph(next_vertex, end_vertex)
+
         _relevant_polygons = dict()
         same_polygon = False
         for index, polygon in enumerate(self._polygons):
-            if line_crosses_convex_shape(start_vertex, self._end, polygon):
+            if line_crosses_convex_shape(start_vertex, end_vertex, polygon):
                 direct_line = False
                 if start_vertex in polygon:
                     same_polygon = True
@@ -258,7 +280,7 @@ class GraphCreator:
                         start_vertex, center_point
                     )
         if (
-            not direct_line
+                not direct_line
         ):  # there isn't direct line between start_vertex to end
             if same_polygon:
                 p = self._polygons[index]
@@ -266,24 +288,72 @@ class GraphCreator:
                 p = self._polygons[
                     min(_relevant_polygons, key=_relevant_polygons.get)
                 ]
-            ch = get_2_points(start_vertex, self._end, p)
+            ch = get_2_points(start_vertex, end_vertex, p)
             for vertex in ch:
-                if self._add_edge_to_graph(start_vertex, vertex):
+                next_point = self._add_edge_to_graph(start_vertex, vertex)
+                if next_point == True:
                     found = any(vertex == edge[0] for edge in self._graph.edges)
                     if not found:
-                        self._rec_optimal_graph(vertex)
+                        self._rec_optimal_graph(vertex, end_vertex)
+                else:
+                    next_point_coord = next_point.coords[0]
+                    if not next_point_coord == start_vertex:
+                        self._add_edge_to_graph(start_vertex, next_point_coord)
+                        self._rec_optimal_graph(next_point_coord, end_vertex)
+
         else:  # there is direct line between start_vertex to end
-            self._add_edge_to_graph(start_vertex, self._end)
+            self._add_edge_to_graph(start_vertex, end_vertex)
             return
 
-    def _get_random_point(self) -> tuple[float, float]:
-        #while True:
-        _x = random.uniform(self._start[0]-100.0, self._field.size)
-        _y = random.uniform(self._start[1]-100.0, self._field.size)
-            #if not self._collision_detector((_x, _y)):
-        return _x, _y
+    def _get_polygon_between_2_points(self, start_vertex: tuple[float, float], end_vertex: tuple[float, float]) -> int:
+        """
+        return the polygon index if it is between 2 points.
+        """
+        for index, polygon in enumerate(self._polygons):
+            if start_vertex in polygon:
+                if line_crosses_convex_shape(start_vertex, end_vertex, polygon):
+                    return index
 
-    def _find_neighbors(self, vertex) -> dict[tuple[float,float]: float]:
+        for index, polygon in enumerate(self._polygons):
+            if line_crosses_convex_shape(start_vertex, end_vertex, polygon):
+                return index
+        return -1
+
+    def _rec_optimal_graph_2(self, start_vertex: tuple[float, float], end_vertex: tuple[float, float]) -> None:
+        """
+        create optimal graph recursively.
+        only vertexes in the relevant direction.
+        """
+        middle_polygon = self._get_polygon_between_2_points(start_vertex, end_vertex)
+
+        if middle_polygon == -1:  # it is possible to get from start_vertex to end point
+            self._add_edge_to_graph(start_vertex, end_vertex)
+            return
+
+        else:
+            next_points = get_2_points(start_vertex, end_vertex, self._polygons[middle_polygon])
+            for vertex in next_points:
+                if self._vertex_inside_map(vertex):  # vertex inside the map
+                    if (start_vertex, vertex) not in self._graph.edges:
+                        self._rec_optimal_graph_2(start_vertex, vertex)
+                        if (vertex, end_vertex) not in self._graph.edges:
+                            self._rec_optimal_graph_2(vertex, end_vertex)
+
+    def _vertex_inside_map(self, vertex: tuple[float, float]) -> bool:
+        x, y = vertex
+        if not (0 < x < self._field.size) or not (0 < y < self._field.size):
+            return False
+        return True
+
+    def _get_random_point(self) -> tuple[float, float]:
+        while True:
+            _x = random.uniform(0, self._field.size)
+            _y = random.uniform(0, self._field.size)
+            if self._vertex_inside_map((_x, _y)):
+                return _x, _y
+        # if not self._collision_detector((_x, _y)):
+
+    def _find_neighbors(self, vertex) -> dict[tuple[float, float]: float]:
         neighbors = dict()
         for node in self._graph.nodes:
             neighbors[node] = distance(vertex, node)
@@ -301,18 +371,18 @@ class GraphCreator:
             random_vertex = self._get_random_point()
             neighbors = self._find_neighbors(random_vertex)
             for node in neighbors:
-                #new_node = random_vertex
-                #if not self._add_edge_to_graph(node, new_node):
+                # new_node = random_vertex
+                # if not self._add_edge_to_graph(node, new_node):
                 new_node = step_point(node, random_vertex, constant.STEP_SIZE)
-                if self._add_edge_to_graph(node, new_node):
-                    break
-                #else:
-                 #   break
-            #if self._add_edge_to_graph(new_node, self._end):
-             #   print("bla")
-              #  logging.info("RTT iterations: {}".format(_))
-               # return
-
+                if self._vertex_inside_map(new_node):
+                    if self._add_edge_to_graph(node, new_node):
+                        break
+                # else:
+                #   break
+            # if self._add_edge_to_graph(new_node, self._end):
+            #   print("bla")
+            #  logging.info("RTT iterations: {}".format(_))
+            # return
 
         neighbors = self._find_neighbors(self._end)
         for node in neighbors:
@@ -351,7 +421,7 @@ class GraphCreator:
             s=50,
             label="End",
         )
-        plt.scatter(xx, yy, s=0.1, color = "gold")
+        plt.scatter(xx, yy, s=0.1, color="gold")
 
         # grid configurations
         plt.axis("on")
@@ -395,13 +465,13 @@ class GraphCreator:
         for i, p in enumerate(self._polygons):
             polygon1 = Polygon(p)
             x, y = polygon1.exterior.xy
-            plt.plot(x, y)
+            plt.plot(x, y, alpha=0.5)
 
         # figure title
         fig.suptitle("Eskimo field", fontsize=15)
 
         nx.draw(
-            self._graph, pos=pos, node_size=15, ax=ax
+            self._graph, pos=pos, node_size=5, ax=ax, style="-."
         )  # draw nodes and edges
         # nx.draw_networkx_labels(self._graph, pos=pos)  # draw node labels/names
 
@@ -426,8 +496,8 @@ class GraphCreator:
             s=50,
             label="End",
         )
-        plt.xlim(-20, 320)
-        plt.ylim(-20, 340)
+        plt.xlim(0, 300)
+        plt.ylim(0, 300)
 
         # Shortest path
         if self._short_path is not None:

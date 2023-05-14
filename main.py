@@ -21,8 +21,9 @@ def main():
     # Step 1: Field parameters
     field_size = 300
     start_point = Point(5, 5)
-    end_point = Point(field_size - 10, field_size - 10)
+    end_point = Point(field_size - 10,  10)
     rand_seed = random.randint(0, 600)
+    rand_seed = 168
 
     # Step 2: Start the program - create the field and write to file
     field_m = FieldManager(
@@ -49,32 +50,32 @@ def main():
     naive_runtime = time.time() - start_time
     logging.info("naive length: {}".format(naive_length))
     logging.info("naive time: {}".format(naive_runtime))
-    #gc.draw_graph()
+    gc.draw_graph()
 
     # Step 6 - Create optimal Graph and find the Shortest Path
     start_time = time.time()
     gc.create_graph(graph_type="optimal")
     optimal_length = gc.shortest_path()
     optimal_runtime = time.time() - start_time
-    logging.info("naive length: {}".format(optimal_length))
-    logging.info("naive time: {}".format(optimal_runtime))
-    #gc.draw_graph()
+    logging.info("optimal length: {}".format(optimal_length))
+    logging.info("optimal time: {}".format(optimal_runtime))
+    gc.draw_graph()
 
     # Step 7 - Create RRT Graph and find the Shortest Path
     start_time = time.time()
     gc.create_graph(graph_type="RRT")
     random_length = gc.shortest_path()
     random_runtime = time.time() - start_time
-    logging.info("naive length: {}".format(random_length))
-    logging.info("naive time: {}".format(random_runtime))
-    #gc.draw_graph()
-
+    logging.info("RRT length: {}".format(random_length))
+    logging.info("RRT time: {}".format(random_runtime))
+    gc.draw_graph()
 
     # Step 8 - Dubins extension
-    gc.create_graph(graph_type="optimal")
-    gc.shortest_path()
-    gc.dubins_graph(vel=10, phi=17)
+    #gc.create_graph(graph_type="optimal")
+    #gc.shortest_path()
+    #gc.dubins_graph(vel=10, phi=17)
+    
+
 
 if __name__ == "__main__":
-    for i in range(10):
-        main()
+    main()

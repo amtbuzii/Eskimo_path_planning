@@ -62,7 +62,6 @@ def read_field(file_name: str) -> Field:
     """
     read txt file and returns - start, end, polygons
     """
-
     file = open(file_name, "r")
     size_x = float(file.readline())
     size_y = float(file.readline())
