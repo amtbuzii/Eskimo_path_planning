@@ -362,15 +362,15 @@ class GraphCreator:
             for j in list(param_dict):
                 param = j[1]
                 path = Dubins.dubins_traj(param=param, step=1)
-                #x_t = path[:, 0]
-                #y_t = path[:, 1]
+                x_t = path[:, 0]
+                y_t = path[:, 1]
 
-                #for k in range(len(x_t) - 1):
-                 #   vertex_a = (x_t[k], y_t[k])
-                  #  vertex_b = (x_t[k + 1], y_t[k + 1])
-                   # weight = distance(vertex_a, vertex_b)
-                    #self._dubins_graph.add_edge(vertex_a, vertex_b, weight=weight)
-                #self.draw_graph()
+                for k in range(len(x_t) - 1):
+                    vertex_a = (x_t[k], y_t[k])
+                    vertex_b = (x_t[k + 1], y_t[k + 1])
+                    weight = distance(vertex_a, vertex_b)
+                    self._dubins_graph.add_edge(vertex_a, vertex_b, weight=weight)
+                self.draw_graph()
 
                 if self._check_dubins_collision(path[:, 0:2]):
                     xx.extend(path[:, 0])
@@ -418,18 +418,12 @@ class GraphCreator:
             point_poly.append(point_polygon)
             new_point = self._increase_distance_from_border(point, point_polygon)
             new_points.append(new_point)
-        print(point_poly)
-        print(new_points)
 
-        for j in range(1, len(point_poly)-1):
-            if point_poly[j] == point_poly[j-1] and point_poly[j] == point_poly[j+1]:
-                new_points.pop(j)
-                point_poly.pop(j)
-                j-=1
-
-        print(point_poly)
-        print(new_points)
-
+        for jj in range(1, len(point_poly) - 1):
+            if point_poly[jj] == point_poly[jj - 1] and point_poly[jj] == point_poly[jj + 1]:
+                new_points.pop(jj)
+                point_poly.pop(jj)
+                jj -= 1
 
         return new_points
 
@@ -455,13 +449,10 @@ class GraphCreator:
 
                 # Move the point along the bisector vector by the desired distance
                 new_vertex = current_vertex - bisector * distance
-                if abs(bisector[0]+bisector[1]) < 0.01:
-                    new_vertex = current_vertex - np.array([0.5,-1]) * distance
-
+                if abs(bisector[0] + bisector[1]) < 0.01:
+                    new_vertex = current_vertex - np.array([0.5, -1]) * distance
 
                 break
-
-
 
         new_vertex = (new_vertex[0], new_vertex[1])
         return new_vertex
@@ -543,8 +534,8 @@ class GraphCreator:
             s=50,
             label="End",
         )
-        #plt.xlim(0, 350)
-        #plt.ylim(0, 350)
+        # plt.xlim(0, 350)
+        # plt.ylim(0, 350)
 
         # Shortest path
         if self._short_path is not None:
@@ -594,7 +585,6 @@ class GraphCreator:
             nx.draw(
                 self._dubins_graph, pos=pos, node_size=0.01, ax=ax, style="-.",
             )  # draw nodes and edges
-
 
         # grid configurations
         plt.axis("on")

@@ -24,5 +24,5 @@ STEP_SIZE = 4
 # Dubins parameters
 DUBINS_VEL = 10 # constant velocity
 DUBINS_PHI = 50 # maximum allowable roll angle
-POLY_TOLERANCE = 5
+POLY_TOLERANCE = 50
 

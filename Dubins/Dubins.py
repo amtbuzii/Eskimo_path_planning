@@ -3,6 +3,7 @@ import math
 import numpy as np
 from enum import Enum
 import copy
+import constant
 
 
 class TurnType(Enum):
@@ -73,7 +74,6 @@ def calc_dubins_path(wpt1: Waypoint, wpt2: Waypoint, vel: float, phi_lim: float)
 
     # Do math
     param.turn_radius = (vel * vel) / (9.8 * math.tan(phi_lim * math.pi / 180))
-    print(param.turn_radius)
     dx = wpt2.x - wpt1.x
     dy = wpt2.y - wpt1.y
     D = math.sqrt(dx * dx + dy * dy)

@@ -21,11 +21,10 @@ def main():
     start_point = Point(5, 5)
     end_point = Point(field_size - 10,  field_size - 10)
     rand_seed = random.randint(0, 600)
-    #rand_seed = 557 - need to solve
+    rand_seed = 557 # need to solve
     # for presentation:
     # seed: 461
     # seed: 554
-    rand_seed = 554
     # Step 2: Start the program - create the field and write to file
     field_m = FieldManager(
         size=field_size, start=start_point, end=end_point, seed=rand_seed
