@@ -123,12 +123,17 @@ determining the most efficient path on that graph.
 
 - **Step 2:**
     - Utilize path planning algorithms such as A* or Dijkstra's algorithm to solve the path planning problem on this graph.
-## Examples
+## Example #1
 ![img.png](project_data/Figure_1.png)
 ![img.png](project_data/Figure_2.png)
 ![img.png](project_data/Figure_3.png)
 ![img.png](project_data/Figure_4.png)
 ![img.png](project_data/Figure_5.png)
+
+## Example #2
+![img.png](project_data/waze_optimal.png)
+![img.png](project_data/waze_rrt.png)
+
 
 
   ## Performance analysis
@@ -147,7 +152,41 @@ determining the most efficient path on that graph.
     * For the random method, what would be the optimal step size? (dynamic step size?)
     * How to distribute the score points, should they be concentrated near the goal or uniformly distributed to avoid obstacles? (pros and cons)
 
-## Part 5: Dubbins model
+## Part 5: Dubins model
+
+- Lester Eli Dubins (1920–2010) demonstrated in 1957 that the shortest path can be achieved by connecting circular arcs with maximum curvature and straight lines.
+- The Dubins model is commonly employed in robotics and motion planning to simplify the description of a vehicle's motion with a fixed turning radius.
+- According to the model, the vehicle is restricted to moving in a straight line forwards or backwards, and can only make turns with a consistent radius.
+
+- The parameters in the Dubins model are as follows:
+  - **velocity** = constant velocity
+  - **phi** = maximum allowable roll angle
+
+- The radius of the turn can calculate by:
+  -  $r={v^{2} \over {g\tan \theta }}$
+  
+- Assumes a constant gravitational acceleration of  (g=9.8 m/s²).
+
+### Dubins algorithm:
+
+1. Compute the optimal path.
+2. Update the path:
+   - Increase the distance from the obstacle by a constant value. 
+   - Remove redundant points by keeping only relevant points for each polygon.
+3. Determine the angle between each point and the next point in the path. 
+4. Calculate all six Dubins paths (RSR, LSL, etc.). 
+5. Sort the paths based on their lengths. 
+6. For each edge, select the shortest collision-free path.
+
+## Example
+
+
+
+![img](https://upload.wikimedia.org/wikipedia/commons/7/7a/Lester_Dubins.jpg)
+
+
+
+
 
   
   

@@ -334,6 +334,8 @@ class GraphCreator:
     def dubins_graph(self, vel: float = constant.DUBINS_VEL, phi: float = constant.DUBINS_PHI) -> None:
         """
         create dubins graph
+        vel = constant velocity
+        phi =  maximum allowable roll angle
         """
         wptz = []
         points = self._short_path[1]
@@ -346,9 +348,6 @@ class GraphCreator:
             temp_pt = Dubins.Waypoint(pt[0], pt[1], psi)
             wptz.append(temp_pt)
         wptz.append(Dubins.Waypoint(points[-1][0], points[-1][1], psi))
-
-        #wptz.pop(2)
-        #wptz.pop(2)
 
         self._dubins_graph = nx.Graph()
 
@@ -412,14 +411,24 @@ class GraphCreator:
         update point for dubins path. increase the distance between the point and polygon border.
         """
         new_points = []
-        point_poly_dict = []
+        point_poly = []
         for ind in range(len(points)):
             point = points[ind]
             point_polygon = self._get_point_polygon(point)
-            point_poly_dict.append(point_polygon)
+            point_poly.append(point_polygon)
             new_point = self._increase_distance_from_border(point, point_polygon)
             new_points.append(new_point)
+        print(point_poly)
+        print(new_points)
 
+        for j in range(1, len(point_poly)-1):
+            if point_poly[j] == point_poly[j-1] and point_poly[j] == point_poly[j+1]:
+                new_points.pop(j)
+                point_poly.pop(j)
+                j-=1
+
+        print(point_poly)
+        print(new_points)
 
 
         return new_points
@@ -446,18 +455,10 @@ class GraphCreator:
 
                 # Move the point along the bisector vector by the desired distance
                 new_vertex = current_vertex - bisector * distance
-
-                # Calculate the average angle of the two edges
-                #average_angle = (np.arctan2(edge1[1], edge1[0]) + np.arctan2(edge2[1], edge2[0])) / 2.0
-
-                #average_direction = (edge1 + edge2) / 2.0
-                #average_direction /= np.linalg.norm(average_direction)
-
-                #average_direction = np.array([np.cos(average_angle), np.sin(average_angle)])
+                if abs(bisector[0]+bisector[1]) < 0.01:
+                    new_vertex = current_vertex - np.array([0.5,-1]) * distance
 
 
-                # Move the point along the average direction vector by the desired distance
-                #new_vertex = current_vertex + average_direction * distance
                 break
 
 
