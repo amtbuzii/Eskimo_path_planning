@@ -1,13 +1,8 @@
-"""
-TODOS:
-- Reduce computation time using the classification methods in the paper
-"""
-
-import matplotlib.pyplot as plt
+from typing import Union
 import math
 import numpy as np
 from enum import Enum
-import itertools
+import copy
 
 
 class TurnType(Enum):
@@ -36,6 +31,10 @@ class Param:
         self.turn_radius = turn_radius
         self.type = 0
 
+    def __str__(self) -> str:
+        return "p_init: " + str(self.p_init) + ", seg_final: " + str(self.seg_final) + ", turn_radius: " + str(
+            self.turn_radius) + ", type: " + str(self.type)
+
 
 def wrapTo360(angle: float) -> float:
     # replace angle 0 to 360
@@ -59,14 +58,16 @@ def heading_to_standard(hdg: float) -> float:
     return thet
 
 
-def calc_dubins_path(wpt1: Waypoint, wpt2: Waypoint, vel: float, phi_lim: float) -> Param:
+def calc_dubins_path(wpt1: Waypoint, wpt2: Waypoint, vel: float, phi_lim: float) -> dict[
+    Union[int, tuple[Union[int, float], ...]], Param]:
     # Calculate a dubins path between two waypoints
-    param = Param(wpt1, 0, 0)
+    param = Param(p_init=wpt1, seg_final=[0, 0, 0], turn_radius=0)
+
     tz = [0, 0, 0, 0, 0, 0]
     pz = [0, 0, 0, 0, 0, 0]
     qz = [0, 0, 0, 0, 0, 0]
-    param.seg_final = [0, 0, 0]
-    # Convert the headings from NED to standard unit cirlce, and then to radians
+
+    # Convert the headings from NED to standard unit circle, and then to radians
     psi1 = heading_to_standard(wpt1.psi) * math.pi / 180
     psi2 = heading_to_standard(wpt2.psi) * math.pi / 180
 
@@ -92,26 +93,25 @@ def calc_dubins_path(wpt1: Waypoint, wpt2: Waypoint, vel: float, phi_lim: float)
     tz[4], pz[4], qz[4] = dubins_RLR(alpha, beta, d)
     tz[5], pz[5], qz[5] = dubins_LRL(alpha, beta, d)
 
+    param_dict = dict()
     # Now, pick the one with the lowest cost
     for x in range(6):
         if (tz[x] != -1):
             cost = tz[x] + pz[x] + qz[x]
-            if (cost < best_cost or best_cost == -1):
-                best_word = x + 1
-                best_cost = cost
-                param.seg_final = [tz[x], pz[x], qz[x]]
+            param.seg_final = [tz[x], pz[x], qz[x]]
+            param.type = TurnType(x + 1)
+            param_dict[cost] = copy.deepcopy(param)
 
-    param.type = TurnType(best_word)
-    return param
+    return param_dict
 
 
 # Here's all of the dubins path math
-def dubins_LSL(alpha: float, beta: float, d: float) -> tuple[float]:
+def dubins_LSL(alpha: float, beta: float, d: float) -> tuple[Union[int, float], Union[int, float], Union[int, float]]:
     tmp0 = d + math.sin(alpha) - math.sin(beta)
     tmp1 = math.atan2((math.cos(beta) - math.cos(alpha)), tmp0)
     p_squared = 2 + d * d - (2 * math.cos(alpha - beta)) + (2 * d * (math.sin(alpha) - math.sin(beta)))
     if p_squared < 0:
-        print('No LSL Path')
+        # print('No LSL Path')
         p = -1
         q = -1
         t = -1
@@ -122,12 +122,12 @@ def dubins_LSL(alpha: float, beta: float, d: float) -> tuple[float]:
     return t, p, q
 
 
-def dubins_RSR(alpha: float, beta: float, d: float) -> tuple[float]:
+def dubins_RSR(alpha: float, beta: float, d: float) -> tuple[Union[int, float], Union[int, float], Union[int, float]]:
     tmp0 = d - math.sin(alpha) + math.sin(beta)
     tmp1 = math.atan2((math.cos(alpha) - math.cos(beta)), tmp0)
     p_squared = 2 + d * d - (2 * math.cos(alpha - beta)) + 2 * d * (math.sin(beta) - math.sin(alpha))
     if p_squared < 0:
-        print('No RSR Path')
+        # print('No RSR Path')
         p = -1
         q = -1
         t = -1
@@ -138,11 +138,11 @@ def dubins_RSR(alpha: float, beta: float, d: float) -> tuple[float]:
     return t, p, q
 
 
-def dubins_RSL(alpha: float, beta: float, d: float) -> tuple[float]:
+def dubins_RSL(alpha: float, beta: float, d: float) -> tuple[Union[int, float], Union[int, float], Union[int, float]]:
     tmp0 = d - math.sin(alpha) - math.sin(beta)
     p_squared = -2 + d * d + 2 * math.cos(alpha - beta) - 2 * d * (math.sin(alpha) + math.sin(beta))
     if p_squared < 0:
-        print('No RSL Path')
+        # print('No RSL Path')
         p = -1
         q = -1
         t = -1
@@ -154,11 +154,11 @@ def dubins_RSL(alpha: float, beta: float, d: float) -> tuple[float]:
     return t, p, q
 
 
-def dubins_LSR(alpha: float, beta: float, d: float) -> tuple[float]:
+def dubins_LSR(alpha: float, beta: float, d: float) -> tuple[Union[int, float], Union[int, float], Union[int, float]]:
     tmp0 = d + math.sin(alpha) + math.sin(beta)
     p_squared = -2 + d * d + 2 * math.cos(alpha - beta) + 2 * d * (math.sin(alpha) + math.sin(beta))
     if p_squared < 0:
-        print('No LSR Path')
+        # print('No LSR Path')
         p = -1
         q = -1
         t = -1
@@ -170,10 +170,10 @@ def dubins_LSR(alpha: float, beta: float, d: float) -> tuple[float]:
     return t, p, q
 
 
-def dubins_RLR(alpha: float, beta: float, d: float) -> tuple[float]:
+def dubins_RLR(alpha: float, beta: float, d: float) -> tuple[Union[int, float], Union[int, float], Union[int, float]]:
     tmp_rlr = (6 - d * d + 2 * math.cos(alpha - beta) + 2 * d * (math.sin(alpha) - math.sin(beta))) / 8
-    if (abs(tmp_rlr) > 1):
-        print('No RLR Path')
+    if abs(tmp_rlr) > 1:
+        # print('No RLR Path')
         p = -1
         q = -1
         t = -1
@@ -186,10 +186,10 @@ def dubins_RLR(alpha: float, beta: float, d: float) -> tuple[float]:
     return t, p, q
 
 
-def dubins_LRL(alpha: float, beta: float, d: float) -> tuple[float]:
+def dubins_LRL(alpha: float, beta: float, d: float) -> tuple[Union[int, float], Union[int, float], Union[int, float]]:
     tmp_lrl = (6 - d * d + 2 * math.cos(alpha - beta) + 2 * d * (-1 * math.sin(alpha) + math.sin(beta))) / 8
-    if (abs(tmp_lrl) > 1):
-        print('No LRL Path')
+    if abs(tmp_lrl) > 1:
+        # print('No LRL Path')
         p = -1
         q = -1
         t = -1
@@ -198,7 +198,6 @@ def dubins_LRL(alpha: float, beta: float, d: float) -> tuple[float]:
         t = (-1 * alpha - math.atan2((math.cos(alpha) - math.cos(beta)),
                                      d + math.sin(alpha) - math.sin(beta)) + p / 2) % (2 * math.pi)
         q = ((beta % (2 * math.pi)) - alpha - t + (p % (2 * math.pi))) % (2 * math.pi)
-        print(t, p, q, beta, alpha)
     return t, p, q
 
 
@@ -279,25 +278,3 @@ def angle_between_points(pt_a, pt_b):
 
     # Convert the angle to degrees and return it
     return math.degrees(angle)
-
-
-def create_dubins_path(points: list[tuple[float, float]], vel: float, phi: float) -> tuple[list, list]:
-    wptz = []
-    for inx in range(len(points) - 1):
-        pt = points[inx]
-        psi = angle_between_points(pt, points[inx + 1])
-        temp_pt = Waypoint(pt[0], pt[1], psi)
-        wptz.append(temp_pt)
-    wptz.append(Waypoint(points[-1][0], points[-1][1], psi))
-    xx = []
-    yy = []
-    total_path = []
-    i = 0
-    while i < len(wptz) - 1:
-        param = calc_dubins_path(wptz[i], wptz[i + 1], vel=vel, phi_lim=phi)
-        path = dubins_traj(param=param, step=1)
-        total_path.extend(path[:, 0:2])
-        xx.extend(path[:, 0])
-        yy.extend(path[:, 1])
-        i += 1
-    return xx, yy

@@ -10,13 +10,19 @@ DEAFULT_END = Point(1.0, 1.0)
 FILE_PATH = "../Eskimo_path_planning/field_data.txt"
 
 # icebergs parameters
-MIN_ICEBERGS = 3
-MAX_ICEBERGS = 3 # maximum number of icebergs should be 70
+MIN_ICEBERGS = 4
+MAX_ICEBERGS = 4 # maximum number of icebergs should be 70
 MIN_DOTS = 3  # min dots in each icebergs
 MAX_DOTS = 10  # max dots in each icebergs
-MIN_RADIUS = 30  # MIN radius size
-MAX_RADIUS = 50  # MAX radius size - should be 45
+MIN_RADIUS = 90  # MIN radius size
+MAX_RADIUS = 100  # MAX radius size - should be 45
 
-#RRT parameters
+# RRT parameters
 ITERATION = 500
 STEP_SIZE = 4
+
+# Dubins parameters
+DUBINS_VEL = 10
+DUBINS_PHI = 20
+POLY_TOLERANCE = 5
+

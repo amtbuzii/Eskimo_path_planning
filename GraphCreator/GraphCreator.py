@@ -13,6 +13,7 @@ from Point import Point
 from math import sqrt
 from Dubins import Dubins
 import logging
+import numpy as np
 
 
 def step_point(node_a: tuple[float, float], node_b: tuple[float, float], step: float) -> tuple[float, float]:
@@ -120,6 +121,7 @@ class GraphCreator:
         self._polygons_center = None
         self._short_path = None
         self._dubins_path = None
+        self._dubins_graph = None
 
     def create_graph(self, graph_type: str = "naive") -> None:
         self._graph = nx.Graph()
@@ -329,44 +331,148 @@ class GraphCreator:
                 break
         return
 
-
-    def dubins_graph(self, vel: float = 50, phi: float = 10) -> None:
+    def dubins_graph(self, vel: float = constant.DUBINS_VEL, phi: float = constant.DUBINS_PHI) -> None:
         """
         create dubins graph
         """
+        wptz = []
+        points = self._short_path[1]
+        points = self._update_dubins_points(points)
+        self._dubins_path = points
 
-        xx, yy = Dubins.create_dubins_path(self._short_path[1], vel=vel, phi=phi)
+        for inx in range(len(points) - 1):
+            pt = points[inx]
+            psi = Dubins.angle_between_points(pt, points[inx + 1])
+            temp_pt = Dubins.Waypoint(pt[0], pt[1], psi)
+            wptz.append(temp_pt)
+        wptz.append(Dubins.Waypoint(points[-1][0], points[-1][1], psi))
 
-        fig, ax = plt.subplots()
-        for i, p in enumerate(self._polygons):
-            polygon1 = Polygon(p)
-            x, y = polygon1.exterior.xy
-            plt.plot(x, y)
+        #wptz.pop(2)
+        #wptz.pop(2)
 
-        # plot START + END point
-        ax.scatter(
-            self._start[0],
-            self._start[1],
-            color="blue",
-            marker="p",
-            s=50,
-            label="Start",
-        )
-        ax.scatter(
-            self._end[0],
-            self._end[1],
-            color="red",
-            marker="*",
-            s=50,
-            label="End",
-        )
-        plt.scatter(xx, yy, s=0.1, color="gold")
+        self._dubins_graph = nx.Graph()
 
-        # grid configurations
-        plt.axis("on")
-        ax.tick_params(left=True, bottom=True, labelleft=True, labelbottom=True)
-        ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.05), ncol=5)
-        plt.show()
+        xx = []
+        yy = []
+
+        i = 0
+        valid_dubins = True
+        while i < len(wptz) - 1:
+            param_dict = Dubins.calc_dubins_path(wptz[i], wptz[i + 1], vel=vel, phi_lim=phi)
+            param_dict = sorted(param_dict.items())
+            for j in list(param_dict):
+                param = j[1]
+                path = Dubins.dubins_traj(param=param, step=1)
+                #x_t = path[:, 0]
+                #y_t = path[:, 1]
+
+                #for k in range(len(x_t) - 1):
+                 #   vertex_a = (x_t[k], y_t[k])
+                  #  vertex_b = (x_t[k + 1], y_t[k + 1])
+                   # weight = distance(vertex_a, vertex_b)
+                    #self._dubins_graph.add_edge(vertex_a, vertex_b, weight=weight)
+                #self.draw_graph()
+
+                if self._check_dubins_collision(path[:, 0:2]):
+                    xx.extend(path[:, 0])
+                    yy.extend(path[:, 1])
+                    break
+                valid_dubins = False
+
+            i += 1
+
+        if not valid_dubins:
+            logging.warning("No valid dubins path found")
+            print("No valid dubins path found")
+        else:
+            logging.warning("Valid dubins path found")
+            print("Valid dubins path found")
+
+            for i in range(len(xx) - 1):
+                vertex_a = (xx[i], yy[i])
+                vertex_b = (xx[i + 1], yy[i + 1])
+                weight = distance(vertex_a, vertex_b)
+                self._dubins_graph.add_edge(vertex_a, vertex_b, weight=weight)
+            self.dubins_last_vertex = vertex_b
+
+    def _check_dubins_collision(self, dubins_path: list[tuple[float, float]]) -> bool:
+        """
+        check if dubins path is valid == not inside polygons
+        """
+        for vertex in dubins_path:
+            for p in self._polygons:
+                polygon = Polygon(p)
+                if polygon.contains(shapely.geometry.Point(vertex)):
+                    return False
+
+        return True
+
+    def _update_dubins_points(self, points: list[tuple[float, float]]) -> list[tuple[float, float]]:
+        """
+        update point for dubins path. increase the distance between the point and polygon border.
+        """
+        new_points = []
+        point_poly_dict = []
+        for ind in range(len(points)):
+            point = points[ind]
+            point_polygon = self._get_point_polygon(point)
+            point_poly_dict.append(point_polygon)
+            new_point = self._increase_distance_from_border(point, point_polygon)
+            new_points.append(new_point)
+
+
+
+        return new_points
+
+    def _increase_distance_from_border(self, point: tuple[float, float], polygon_index: int,
+                                       distance: float = constant.POLY_TOLERANCE) -> tuple[float, float]:
+        polygon = self._polygons[polygon_index]
+        num_vertices = len(polygon)
+        new_vertex = point
+
+        for i in range(num_vertices):
+            current_vertex = polygon[i]
+
+            if current_vertex == point:
+                prev_vertex = polygon[i - 1]
+                next_vertex = polygon[(i + 1) % num_vertices]
+
+                # Calculate the average direction vector of the two adjacent edges
+                edge1 = np.array(prev_vertex) - np.array(current_vertex)
+                edge2 = np.array(next_vertex) - np.array(current_vertex)
+
+                # Calculate the bisector vector of the two adjacent edges
+                bisector = edge1 / np.linalg.norm(edge1) + edge2 / np.linalg.norm(edge2)
+
+                # Move the point along the bisector vector by the desired distance
+                new_vertex = current_vertex - bisector * distance
+
+                # Calculate the average angle of the two edges
+                #average_angle = (np.arctan2(edge1[1], edge1[0]) + np.arctan2(edge2[1], edge2[0])) / 2.0
+
+                #average_direction = (edge1 + edge2) / 2.0
+                #average_direction /= np.linalg.norm(average_direction)
+
+                #average_direction = np.array([np.cos(average_angle), np.sin(average_angle)])
+
+
+                # Move the point along the average direction vector by the desired distance
+                #new_vertex = current_vertex + average_direction * distance
+                break
+
+
+
+        new_vertex = (new_vertex[0], new_vertex[1])
+        return new_vertex
+
+    def _get_point_polygon(self, point) -> int:
+        """
+        return the polygon index that the point located on it border.
+        """
+        for index, poly in enumerate(self._polygons):
+            if point in poly:
+                return index
+        return -1
 
     @property
     def _polygons_center_calc(self) -> dict[int, tuple]:
@@ -396,7 +502,7 @@ class GraphCreator:
         except nx.exception.NetworkXNoPath:
             logging.warning('No optimal path')
 
-    def draw_graph(self, save=False, t=0) -> None:
+    def draw_graph(self, dubins: bool = False, save: bool = False, t: int = 0) -> None:
         pos = {point: point for point in self._graph.nodes}
 
         # add axis
@@ -409,9 +515,10 @@ class GraphCreator:
         # figure title
         fig.suptitle("Eskimo field", fontsize=15)
 
-        nx.draw(
-            self._graph, pos=pos, node_size=5, ax=ax, style="-."
-        )  # draw nodes and edges
+        if self._dubins_graph is None:
+            nx.draw(
+                self._graph, pos=pos, node_size=5, ax=ax, style="-."
+            )  # draw nodes and edges
         # nx.draw_networkx_labels(self._graph, pos=pos)  # draw node labels/names
 
         # draw edge weights
@@ -435,19 +542,21 @@ class GraphCreator:
             s=50,
             label="End",
         )
-        plt.xlim(0, 300)
-        plt.ylim(0, 300)
+        #plt.xlim(0, 350)
+        #plt.ylim(0, 350)
 
         # Shortest path
         if self._short_path is not None:
             # draw path in red
+
             path = self._short_path[1]
             path_edges = list(zip(path, path[1:]))
+
             nx.draw_networkx_nodes(
                 self._graph,
                 pos,
                 nodelist=path,
-                node_size=5,
+                node_size=2,
                 node_color="r",
                 ax=ax,
             )
@@ -455,19 +564,36 @@ class GraphCreator:
                 self._graph,
                 pos,
                 edgelist=path_edges,
-                width=6,
+                width=2,
                 alpha=0.3,
                 edge_color="r",
                 ax=ax,
             )
             # Adding text
-            plt.text(
-                100,
-                310,
-                "Path length " + str(("%.2f" % self._short_path[0])),
-                fontsize=10,
-                bbox=dict(facecolor="red", alpha=0.5),
+            if self._dubins_graph is None:
+                plt.text(
+                    100,
+                    310,
+                    "Path length " + str(("%.2f" % self._short_path[0])),
+                    fontsize=10,
+                    bbox=dict(facecolor="red", alpha=0.5),
+                )
+
+        if self._dubins_graph is not None:
+            pos = {point: point for point in self._dubins_graph.nodes}
+            x = [point[0] for point in self._dubins_path]
+            y = [point[1] for point in self._dubins_path]
+            ax.scatter(
+                x,
+                y,
+                color="red",
+                marker="*",
+                s=50,
             )
+            nx.draw(
+                self._dubins_graph, pos=pos, node_size=0.01, ax=ax, style="-.",
+            )  # draw nodes and edges
+
 
         # grid configurations
         plt.axis("on")

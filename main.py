@@ -21,7 +21,8 @@ def main():
     start_point = Point(5, 5)
     end_point = Point(field_size - 10,  field_size - 10)
     rand_seed = random.randint(0, 600)
-
+    #rand_seed = 557 - need to solve
+    # seed: 461 example to show
     # Step 2: Start the program - create the field and write to file
     field_m = FieldManager(
         size=field_size, start=start_point, end=end_point, seed=rand_seed
@@ -67,13 +68,11 @@ def main():
     logging.info("RRT time: {}".format(random_runtime))
     gc.draw_graph()
 
-
     # Step 8 - Dubins extension
     gc.create_graph(graph_type="optimal")
     gc.shortest_path()
-    gc.dubins_graph(vel=10, phi=17)
-    
-
+    gc.dubins_graph(vel=15, phi=20)
+    gc.draw_graph()
 
 if __name__ == "__main__":
     main()
