@@ -45,7 +45,9 @@ def write_to_file(file_name: str, lines: str = "") -> None:
     except FileNotFoundError:
         logging.info("Error: The file was not found.")
     except PermissionError:
-        logging.info("Error: You don't have the required permissions to access the file.")
+        logging.info(
+            "Error: You don't have the required permissions to access the file."
+        )
     except OSError as e:
         logging.info("Error: An operating system error occurred -", e)
     except ValueError:
@@ -91,7 +93,7 @@ def show_field(field_data: Field, convex: bool) -> None:
 
     # figure title
     # plt.figure(1, figsize=(5, 5))
-    # plt.suptitle("Eskimo field", fontsize=15)
+    plt.suptitle("Eskimo field", fontsize=15)
 
     # plot START + END point
     plt.scatter(
@@ -122,8 +124,8 @@ def show_field(field_data: Field, convex: bool) -> None:
             points_y.append(points_y[0])
             plt.plot(points_x, points_y, linewidth=1)
 
-    # plt.xlim(-5,field_data.size)
-    # plt.ylim(-5,field_data.size)
+    # plt.xlim(-50,350)
+    # plt.ylim(-50,350)
 
     # grid configurations
     plt.legend(loc="upper center", bbox_to_anchor=(0.5, -0.05), ncol=5)
