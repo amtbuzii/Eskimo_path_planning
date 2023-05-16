@@ -171,8 +171,8 @@ determining the most efficient path on that graph.
 
 1. Compute the optimal path.
 2. Update the path:
-   - Increase the distance from the obstacle by a constant value. 
-   - Remove redundant points by keeping only relevant points for each polygon.
+   - Increase the distance from the obstacle by a constant value (bisector angle). 
+   - Remove redundant points (close points).
 3. Determine the angle between each point and the next point in the path. 
 4. Calculate all six Dubins paths (RSR, LSL, etc.). 
 5. Sort the paths based on their lengths. 
@@ -180,6 +180,11 @@ determining the most efficient path on that graph.
 
 ## Example
 
+![img.png](project_data/dub_1.png)
+![img.png](project_data/dub_2.png)
+![img.png](project_data/dub_3.png)
+![img.png](project_data/dub_4.png)
+![img.png](project_data/dub_5.png)
 
 
 ![img](https://upload.wikimedia.org/wikipedia/commons/7/7a/Lester_Dubins.jpg)

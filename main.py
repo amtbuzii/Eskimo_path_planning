@@ -15,16 +15,18 @@ logging.basicConfig(
 
 
 def main():
-
     # Step 1: Field parameters
     field_size = 300
     start_point = Point(5, 5)
-    end_point = Point(field_size - 10,  field_size - 10)
+    end_point = Point(field_size - 10, field_size - 10)
     rand_seed = random.randint(0, 600)
-    rand_seed = 557 # need to solve
     # for presentation:
     # seed: 461
     # seed: 554
+    # seed: 272
+    # seed: 557
+    # seed: 154
+
     # Step 2: Start the program - create the field and write to file
     field_m = FieldManager(
         size=field_size, start=start_point, end=end_point, seed=rand_seed
@@ -45,7 +47,7 @@ def main():
 
     # Step 5 - Create naive Graph and find the Shortest Path
     start_time = time.time()
-    gc.create_graph(graph_type="naive")
+    gc.create_graph(graph_type="Naive")
     naive_length = gc.shortest_path()
     naive_runtime = time.time() - start_time
     logging.info("naive length: {}".format(naive_length))
@@ -54,7 +56,7 @@ def main():
 
     # Step 6 - Create optimal Graph and find the Shortest Path
     start_time = time.time()
-    gc.create_graph(graph_type="optimal")
+    gc.create_graph(graph_type="Optimal")
     optimal_length = gc.shortest_path()
     optimal_runtime = time.time() - start_time
     logging.info("optimal length: {}".format(optimal_length))
@@ -71,10 +73,14 @@ def main():
     gc.draw_graph()
 
     # Step 8 - Dubins extension
-    gc.create_graph(graph_type="optimal")
-    gc.shortest_path()
-    gc.dubins_graph(vel=13, phi=45)
+    start_time = time.time()
+    gc.create_graph(graph_type="Dubins")
+    dubins_length = gc.get_dubins_path_length()
+    dubins_runtime = time.time() - start_time
+    logging.info("Dubins length: {}".format(dubins_length))
+    logging.info("Dubins time: {}".format(dubins_runtime))
     gc.draw_graph()
+
 
 if __name__ == "__main__":
     main()
