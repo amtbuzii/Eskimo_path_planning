@@ -3,6 +3,7 @@ import math
 import numpy as np
 from enum import Enum
 import copy
+import constant
 
 
 class TurnType(Enum):
@@ -53,7 +54,7 @@ def wrap_to_180(angle: float) -> float:
 
 
 def heading_to_standard(hdg: float) -> float:
-    # Convert NED heading to standard unit cirlce...degrees only for now (Im lazy)
+    # Convert NED heading to standard unit circle...
     thet = wrapTo360(90 - wrap_to_180(hdg))
     return thet
 

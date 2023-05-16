@@ -334,6 +334,8 @@ class GraphCreator:
     def dubins_graph(self, vel: float = constant.DUBINS_VEL, phi: float = constant.DUBINS_PHI) -> None:
         """
         create dubins graph
+        vel = constant velocity
+        phi =  maximum allowable roll angle
         """
         wptz = []
         points = self._short_path[1]
@@ -346,9 +348,6 @@ class GraphCreator:
             temp_pt = Dubins.Waypoint(pt[0], pt[1], psi)
             wptz.append(temp_pt)
         wptz.append(Dubins.Waypoint(points[-1][0], points[-1][1], psi))
-
-        #wptz.pop(2)
-        #wptz.pop(2)
 
         self._dubins_graph = nx.Graph()
 
@@ -363,15 +362,15 @@ class GraphCreator:
             for j in list(param_dict):
                 param = j[1]
                 path = Dubins.dubins_traj(param=param, step=1)
-                #x_t = path[:, 0]
-                #y_t = path[:, 1]
+                x_t = path[:, 0]
+                y_t = path[:, 1]
 
-                #for k in range(len(x_t) - 1):
-                 #   vertex_a = (x_t[k], y_t[k])
-                  #  vertex_b = (x_t[k + 1], y_t[k + 1])
-                   # weight = distance(vertex_a, vertex_b)
-                    #self._dubins_graph.add_edge(vertex_a, vertex_b, weight=weight)
-                #self.draw_graph()
+                for k in range(len(x_t) - 1):
+                    vertex_a = (x_t[k], y_t[k])
+                    vertex_b = (x_t[k + 1], y_t[k + 1])
+                    weight = distance(vertex_a, vertex_b)
+                    self._dubins_graph.add_edge(vertex_a, vertex_b, weight=weight)
+                self.draw_graph()
 
                 if self._check_dubins_collision(path[:, 0:2]):
                     xx.extend(path[:, 0])
@@ -412,15 +411,19 @@ class GraphCreator:
         update point for dubins path. increase the distance between the point and polygon border.
         """
         new_points = []
-        point_poly_dict = []
+        point_poly = []
         for ind in range(len(points)):
             point = points[ind]
             point_polygon = self._get_point_polygon(point)
-            point_poly_dict.append(point_polygon)
+            point_poly.append(point_polygon)
             new_point = self._increase_distance_from_border(point, point_polygon)
             new_points.append(new_point)
 
-
+        for jj in range(1, len(point_poly) - 1):
+            if point_poly[jj] == point_poly[jj - 1] and point_poly[jj] == point_poly[jj + 1]:
+                new_points.pop(jj)
+                point_poly.pop(jj)
+                jj -= 1
 
         return new_points
 
@@ -446,21 +449,10 @@ class GraphCreator:
 
                 # Move the point along the bisector vector by the desired distance
                 new_vertex = current_vertex - bisector * distance
+                if abs(bisector[0] + bisector[1]) < 0.01:
+                    new_vertex = current_vertex - np.array([0.5, -1]) * distance
 
-                # Calculate the average angle of the two edges
-                #average_angle = (np.arctan2(edge1[1], edge1[0]) + np.arctan2(edge2[1], edge2[0])) / 2.0
-
-                #average_direction = (edge1 + edge2) / 2.0
-                #average_direction /= np.linalg.norm(average_direction)
-
-                #average_direction = np.array([np.cos(average_angle), np.sin(average_angle)])
-
-
-                # Move the point along the average direction vector by the desired distance
-                #new_vertex = current_vertex + average_direction * distance
                 break
-
-
 
         new_vertex = (new_vertex[0], new_vertex[1])
         return new_vertex
@@ -542,8 +534,8 @@ class GraphCreator:
             s=50,
             label="End",
         )
-        #plt.xlim(0, 350)
-        #plt.ylim(0, 350)
+        # plt.xlim(0, 350)
+        # plt.ylim(0, 350)
 
         # Shortest path
         if self._short_path is not None:
@@ -593,7 +585,6 @@ class GraphCreator:
             nx.draw(
                 self._dubins_graph, pos=pos, node_size=0.01, ax=ax, style="-.",
             )  # draw nodes and edges
-
 
         # grid configurations
         plt.axis("on")
