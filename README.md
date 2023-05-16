@@ -187,8 +187,6 @@ determining the most efficient path on that graph.
 ![img.png](project_data/dub_5.png)
 
 
-![img](https://upload.wikimedia.org/wikipedia/commons/7/7a/Lester_Dubins.jpg)
-
 
 
 
