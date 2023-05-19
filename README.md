@@ -83,16 +83,34 @@ determining the most efficient path on that graph.
 
 - **Step 1: Creating a graph (using networkx library)**
     - There exist multiple techniques for graph construction:
-        - Grid approach.
-        - Naive approach.
-        - Optimal approach.
-        - Random approach.
+        - **Grid** approach.
+        - **Naive** approach.
+        - **Greedy** approach.
+        - **Optimal** approach.
+        - **Random** approach.
       
       ## Naive approach: including all available nodes and vertices.
         1. Union of polygons that share a common boundary. (**not convex** polygon)
         2. Connect all possible nodes in the field while also ensuring collision detection and avoidance.
 
       ![img.png](project_data/naive.png)
+  
+      ## Greedy approach: select the shortest path to traverse the polygon.
+        1. Union of polygons that share a common boundary. (inflation **convex** polygon)
+            - **If** the starting or ending point is located inside the union of polygons, then the simple approach of including all available nodes and vertices should be used.
+        2. Recursive_algorithm(start_point):
+            - If it is possible to draw a straight line between the starting and ending points:
+                - Done.
+            - else:
+                - p = first polygon that lies between the starting point and the ending point.
+                - Do ConvexHull(start, end, p)
+                - s_left, s_right = Identify two points on the new polygon that are positioned on opposite sides of the starting point.
+                - Split the polygon into two smaller polygons and calculate their perimeters.
+                - If the left_side is shorter:
+                    - Recursive_algorithm(s_left)
+                - else:
+                    - Recursive_algorithm(s_right)
+        ![img.png](project_data/naive.png)
 
       ## Optimal approach: generating a graph solely based on the relevant convex shapes.
         1. Union of polygons that share a common boundary. (inflation **convex** polygon)
@@ -135,15 +153,34 @@ determining the most efficient path on that graph.
 ![img.png](project_data/waze_rrt.png)
 
 
-
-  ## Performance analysis
+  # Performance Analysis
 ![img.png](project_data/runtime1.png)
 
-  ### Run-time analysis
-![img.png](project_data/runtime_1.png)
+  ### Runtime analysis
+![img.png](project_data/runtime_all.png)
+![img.png](project_data/runtime_3.png)
+![img.png](project_data/runtime2.png)
 
-  ### Path planning analysis
-![img.png](project_data/path_calc_analysis.png)
+*****************************************
+
+  ### Comparison (100 attempts):
+![img.png](project_data/per_1.png)
+
+**Path length:** (straight line is: 290 sqrt(2)≈410.122)
+1. Naive mean 415.398125 (s.d. 11.26)
+2. Optimal mean 416.9352083333333 (s.d. 12.96)
+3. Greedy mean 418.64572916666674 (s.d. 13.33)
+5. Random mean 589.169255319149 (s.d. 54.56)
+
+* Dubins mean 648.76875 (s.d. 200.65)
+
+**Runtime [s]:** 
+1. Greedy mean 0.042310516039530434 (s.d. 0.0086)
+2. Optimal mean 0.08515359461307526 (s.d. 0.243)
+3. Naive mean 3.513621009886265 (s.d. 0.442)
+4. Random mean 24.165488650550444 (s.d. 4.52)
+
+* Dubins mean 0.37494373818238574 (s.d. 0.144)
 
 
 - TBD:
@@ -178,13 +215,21 @@ determining the most efficient path on that graph.
 5. Sort the paths based on their lengths. 
 6. For each edge, select the shortest collision-free path.
 
-## Example
+## Example #1
 
 ![img.png](project_data/dub_1.png)
 ![img.png](project_data/dub_2.png)
 ![img.png](project_data/dub_3.png)
 ![img.png](project_data/dub_4.png)
 ![img.png](project_data/dub_5.png)
+
+## Example #2
+![img.png](project_data/per_1.png)
+![img.png](project_data/per_2.png)
+![img.png](project_data/per_3.png)
+![img.png](project_data/per_4.png)
+![img.png](project_data/per_5.png)
+![img.png](project_data/per_6.png)
 
 
 

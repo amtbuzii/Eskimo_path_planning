@@ -93,6 +93,53 @@ def get_2_points(
     return new_convex[before].to_tuple(), new_convex[after].to_tuple()
 
 
+def get_split_polygons(
+    polygon: list[tuple[float, float]],
+    start: tuple[float, float],
+    end: tuple[float, float],
+) -> tuple[Polygon, Polygon]:
+    """
+    This function takes a polygon and two points as inputs and generates a line that intersects the polygon.
+    It then return 2 new polygons
+    """
+    x1, y1 = start
+    x2, y2 = end
+    polygon = Polygon(polygon)
+
+    intersection = polygon.intersection(LineString([start, end]))
+    intersection_points = list(intersection.coords)
+    vertices = list(polygon.exterior.coords)
+    line_start, line_end = intersection_points
+    left_side = [line_start, line_end]
+    right_side = [line_start, line_end]
+
+    for i, vertex in enumerate(vertices):
+        x, y = vertex
+
+        # Calculate the determinant
+        determinant = (x2 - x1) * (y - y1) - (x - x1) * (y2 - y1)
+        if determinant > 0:
+            right_side.append(vertex)  # Point is on the right side of the line
+        elif determinant < 0:
+            left_side.append(vertex)  # Point is on the left side of the line
+        else:
+            right_side.append(vertex)
+            left_side.append(vertex)
+
+    # do convex hull to order the points
+    left_polygon = ConvexHull(
+        [Point.Point(point[0], point[1]) for point in left_side]
+    ).hull
+    right_polygon = ConvexHull(
+        [Point.Point(point[0], point[1]) for point in right_side]
+    ).hull
+
+    left_polygon = Polygon([p.to_tuple() for p in left_polygon])
+    right_polygon = Polygon([p.to_tuple() for p in right_polygon])
+
+    return right_polygon, left_polygon
+
+
 def distance(vertex_a: tuple[float, float], vertex_b: tuple[float, float]) -> float:
     return round(
         sqrt((vertex_a[0] - vertex_b[0]) ** 2 + (vertex_a[1] - vertex_b[1]) ** 2),
@@ -177,6 +224,9 @@ class GraphCreator:
         elif graph_type == "Optimal":
             self._union_convex
             self._optimal_graph
+        elif graph_type == "Greedy":
+            self._union_convex
+            self._greedy_graph
         elif graph_type == "RRT":
             self._union_not_convex
             self._random_graph()
@@ -186,7 +236,7 @@ class GraphCreator:
         elif graph_type == "Dubins":
             self._union_convex
             self._optimal_graph
-            self.dubins_graph(vel=13, phi=45)
+            self.dubins_graph(vel=constant.DUBINS_VEL, phi=constant.DUBINS_PHI)
         else:
             logging.warning("invalid graph type (naive / optimal / RRT)")
             raise ValueError("invalid graph type")
@@ -262,7 +312,6 @@ class GraphCreator:
         """
         create optimal graph (using recursive function - self._rec_optimal_graph
         """
-
         for p in self._polygons:
             polygon = Polygon(p)
             if (polygon.contains(shapely.geometry.Point(self._start))) or (
@@ -275,6 +324,27 @@ class GraphCreator:
 
         self._polygons_center = self._polygons_center_calc
         self._rec_optimal_graph(self._start, self._end)
+        return
+
+    @property
+    def _greedy_graph(self) -> None:
+        """
+        create greedy graph (using recursive function - self._rec_greedy_graph
+        """
+
+        for p in self._polygons:
+            polygon = Polygon(p)
+            if (polygon.contains(shapely.geometry.Point(self._start))) or (
+                polygon.contains(shapely.geometry.Point(self._end))
+            ):
+                logging.info(
+                    "No optimal solution - start/end point inside convex shape, try naive way"
+                )
+                exit()
+
+        self._polygons_center = self._polygons_center_calc
+        self._rec_greedy_graph(self._start, self._end)
+        return
 
     @property
     def _union_convex(self) -> None:
@@ -302,15 +372,28 @@ class GraphCreator:
         """
         return the polygon index if it is between 2 points.
         """
+        # if the start point is on the polygon
         for index, polygon in enumerate(self._polygons):
             if start_vertex in polygon:
                 if line_crosses_convex_shape(start_vertex, end_vertex, polygon):
                     return index
 
+        relevant_polygons = []
         for index, polygon in enumerate(self._polygons):
             if line_crosses_convex_shape(start_vertex, end_vertex, polygon):
-                return index
-        return -1
+                relevant_polygons.append(index)
+
+        if relevant_polygons == []:  # no polygon between 2 points
+            return -1
+        else:
+            best_dis = 99999999
+            best_index = -1
+            for index in relevant_polygons:
+                temp_dis = distance(start_vertex, self._polygons_center[index])
+                if temp_dis < best_dis:
+                    best_dis = temp_dis
+                    best_index = index
+            return best_index
 
     def _rec_optimal_graph(
         self, start_vertex: tuple[float, float], end_vertex: tuple[float, float]
@@ -336,6 +419,56 @@ class GraphCreator:
                         if (vertex, end_vertex) not in self._graph.edges:
                             self._rec_optimal_graph(vertex, end_vertex)
 
+    def _rec_greedy_graph(
+        self, start_vertex: tuple[float, float], end_vertex: tuple[float, float]
+    ) -> None:
+        """
+        create optimal graph recursively.
+        only vertexes in the relevant direction.
+        """
+        middle_polygon = self._get_polygon_between_2_points(start_vertex, end_vertex)
+
+        if middle_polygon == -1:  # it is possible to get from start_vertex to end point
+            self._add_edge_to_graph(start_vertex, end_vertex)
+            return
+        else:
+            left_side_poly, right_side_poly = get_split_polygons(
+                self._polygons[middle_polygon], start_vertex, end_vertex
+            )
+
+            next_points = get_2_points(
+                start_vertex, end_vertex, self._polygons[middle_polygon]
+            )
+            next_points = [
+                point for point in next_points if self._vertex_inside_map(point)
+            ]
+            l_point = None
+            r_point = None
+            for vertex in next_points:
+                if vertex in list(left_side_poly.exterior.coords):
+                    l_point = vertex
+                elif vertex in list(right_side_poly.exterior.coords):
+                    r_point = vertex
+
+            if len(next_points) == 1:
+                if (start_vertex, next_points[0]) not in self._graph.edges:
+                    self._rec_greedy_graph(start_vertex, next_points[0])
+                    if (next_points[0], end_vertex) not in self._graph.edges:
+                        self._rec_greedy_graph(next_points[0], end_vertex)
+            else:
+                if left_side_poly.length <= right_side_poly.length and l_point != None:
+                    if (start_vertex, l_point) not in self._graph.edges:
+                        self._rec_greedy_graph(start_vertex, l_point)
+                        if (l_point, end_vertex) not in self._graph.edges:
+                            self._rec_greedy_graph(l_point, end_vertex)
+                elif (
+                    right_side_poly.length < left_side_poly.length and r_point != None
+                ) or self._end not in self._graph.nodes:
+                    if (start_vertex, r_point) not in self._graph.edges:
+                        self._rec_greedy_graph(start_vertex, r_point)
+                        if (r_point, end_vertex) not in self._graph.edges:
+                            self._rec_greedy_graph(r_point, end_vertex)
+
     def _vertex_inside_map(self, vertex: tuple[float, float]) -> bool:
         x, y = vertex
         if not (0 < x < self._field.size) or not (0 < y < self._field.size):
@@ -348,7 +481,6 @@ class GraphCreator:
             _y = random.uniform(0, self._field.size)
             if self._vertex_inside_map((_x, _y)):
                 return _x, _y
-        # if not self._collision_detector((_x, _y)):
 
     def _find_neighbors(self, vertex) -> dict[tuple[float, float] : float]:
         neighbors = dict()
@@ -362,7 +494,6 @@ class GraphCreator:
         create random graph - RRT
         """
         n_iter = constant.ITERATION
-        random.seed(random.randint(0, 1555))
         self._graph.add_node(self._start)
         for _ in range(n_iter):
             random_vertex = self._get_random_point()
@@ -425,6 +556,7 @@ class GraphCreator:
 
         if not valid_dubins:
             logging.debug("No valid dubins path found")
+            self._dubins_graph = None
         else:
             logging.debug("Valid dubins path found")
             for i in range(len(xx) - 1):
@@ -519,13 +651,10 @@ class GraphCreator:
                 weight="weight",
             )
             return dubins_length[0]
-
-        except nx.exception.NodeNotFound:
+        except Exception:
             logging.warning("No Dubins path found.")
-        except nx.exception.NetworkXNoPath:
-            logging.warning("No Dubins path")
 
-    def draw_graph(self, dubins: bool = False, save: bool = False, t: int = 0) -> None:
+    def draw_graph(self, save: bool = False, t: int = 0) -> None:
         pos = {point: point for point in self._graph.nodes}
 
         # add axis
@@ -541,7 +670,7 @@ class GraphCreator:
 
         # draw nodes and edges
         if self._dubins_graph is None:
-            nx.draw(self._graph, pos=pos, node_size=5, ax=ax, style="-.")
+            nx.draw(self._graph, pos=pos, node_size=1, ax=ax, style="-.")
 
         # plot START + END point
         ax.scatter(
@@ -560,8 +689,8 @@ class GraphCreator:
             s=50,
             label="End",
         )
-        # plt.xlim(-50, 350)
-        # plt.ylim(-50, 350)
+        plt.xlim(0, 300)
+        plt.ylim(0, 300)
 
         # Shortest path
         if self._short_path is not None:
@@ -590,7 +719,7 @@ class GraphCreator:
             # Adding text
             if self._dubins_graph is None:
                 plt.text(
-                    100,
+                    200,
                     310,
                     "Path length " + str(("%.2f" % self._short_path[0])),
                     fontsize=10,
@@ -617,12 +746,14 @@ class GraphCreator:
             )  # draw nodes and edges
 
             plt.text(
-                100,
-                310,
+                200,
+                335,
                 "Path length " + str(("%.2f" % self.get_dubins_path_length())),
                 fontsize=10,
                 bbox=dict(facecolor="red", alpha=0.5),
             )
+            plt.xlim(-25, 325)
+            plt.ylim(-25, 325)
 
         # grid configurations
         plt.axis("on")
