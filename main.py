@@ -19,7 +19,8 @@ def main():
     field_size = 300
     start_point = Point(5, 5)
     end_point = Point(field_size - 10, field_size - 10)
-    rand_seed = random.randint(0, 600)
+    rand_seed = random.randint(0, 500)
+
     # for presentation:
     # seed: 461
     # seed: 554
@@ -63,7 +64,16 @@ def main():
     logging.info("optimal time: {}".format(optimal_runtime))
     gc.draw_graph()
 
-    # Step 7 - Create RRT Graph and find the Shortest Path
+    # Step 7 - Create optimal* Graph and find the Shortest Path
+    start_time = time.time()
+    gc.create_graph(graph_type="Greedy")
+    greedy_length = gc.shortest_path()
+    greedy_runtime = time.time() - start_time
+    logging.info("greedy length: {}".format(greedy_length))
+    logging.info("greedy time: {}".format(greedy_runtime))
+    gc.draw_graph()
+
+    # Step 8 - Create RRT Graph and find the Shortest Path
     start_time = time.time()
     gc.create_graph(graph_type="RRT")
     random_length = gc.shortest_path()
@@ -72,7 +82,7 @@ def main():
     logging.info("RRT time: {}".format(random_runtime))
     gc.draw_graph()
 
-    # Step 8 - Dubins extension
+    # Step 9 - Dubins extension
     start_time = time.time()
     gc.create_graph(graph_type="Dubins")
     dubins_length = gc.get_dubins_path_length()
@@ -80,6 +90,8 @@ def main():
     logging.info("Dubins length: {}".format(dubins_length))
     logging.info("Dubins time: {}".format(dubins_runtime))
     gc.draw_graph()
+
+    return
 
 
 if __name__ == "__main__":
