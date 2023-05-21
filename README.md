@@ -136,8 +136,7 @@ determining the most efficient path on that graph.
          - Create a new node between the closest neighboring point and the random point, using a specified step size.
          - If the new node is in proximity to the target point or has reached it:
            - Done!
-
-        ![img.png](project_data/random_graph.png)
+        ![img.png](project_data/RRT_ex.png)
 
 - **Step 2:**
     - Utilize path planning algorithms such as A* or Dijkstra's algorithm to solve the path planning problem on this graph.
