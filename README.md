@@ -231,8 +231,7 @@ determining the most efficient path on that graph.
 ![img.png](project_data/per_5.png)
 ![img.png](project_data/per_6.png)
 
-
-- TBD:
+## TBD
 * Collision detection process improvements:
   * Use efficient data structures like octrees or BVHs.
   * Implement bounding volumes to quickly discard non-colliding pairs.
