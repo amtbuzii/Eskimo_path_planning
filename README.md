@@ -166,28 +166,28 @@ determining the most efficient path on that graph.
   ### Comparison (100 attempts):
 ![img.png](project_data/per_1.png)
 
-**Path length:** (straight line is: 290 sqrt(2)≈410.122)
-1. Naive mean 415.398125 (s.d. 11.26)
-2. Optimal mean 416.9352083333333 (s.d. 12.96)
-3. Greedy mean 418.64572916666674 (s.d. 13.33)
-5. Random mean 589.169255319149 (s.d. 54.56)
+## Path length: 
+* direct line $≈410.122$
+1. **Naive** $\mu=415.34$, $\sigma=11.26$
+2. **Optimal** $\mu=416.93$, $\sigma=12.96$
+3. **Greedy** $\mu=418.64$, $\sigma=13.33$
+4. **Random** $\mu=589.17$, $\sigma=54.56$
 
-* Dubins mean 648.76875 (s.d. 200.65)
+**Dubins** $\mu=648.77$, $\sigma=200.65$
 
-**Runtime [s]:** 
-1. Greedy mean 0.042310516039530434 (s.d. 0.0086)
-2. Optimal mean 0.08515359461307526 (s.d. 0.243)
-3. Naive mean 3.513621009886265 (s.d. 0.442)
-4. Random mean 24.165488650550444 (s.d. 4.52)
+![img.png](project_data/lengths_c.png)
 
-* Dubins mean 0.37494373818238574 (s.d. 0.144)
+![img.png](project_data/lengths_c2.png)
 
+## Runtime [s]: 
+1. **Naive** $\mu=0.0423$, $\sigma=0.008$
+2. **Optimal** $\mu=0.085$, $\sigma=0.243$
+3. **Greedy** $\mu=3.513$, $\sigma=0.442$
+4. **Random** $\mu=24.165$, $\sigma=4.52$
 
-- TBD:
-    * Is there room for improvement in the collision detection process in the naive method?
-    * How to handle extreme cases in the optimal method?
-    * For the random method, what would be the optimal step size? (dynamic step size?)
-    * How to distribute the score points, should they be concentrated near the goal or uniformly distributed to avoid obstacles? (pros and cons)
+* **Dubins** $\mu=0.374.77$, $\sigma=0.14$
+
+![img.png](project_data/runtime_c.png)
 
 ## Part 5: Dubins model
 
@@ -232,10 +232,24 @@ determining the most efficient path on that graph.
 ![img.png](project_data/per_6.png)
 
 
+- TBD:
+* Collision detection process improvements:
+  * Use efficient data structures like octrees or BVHs.
+  * Implement bounding volumes to quickly discard non-colliding pairs.
+  * Employ hierarchical collision detection techniques.
+  * Utilize parallel processing for faster computations.
 
+* Random method - step size/dynamic step size:
+  * Choose a fixed step size or use a dynamic step size approach.
+  * Dynamic step size can start large and decrease gradually for accuracy and convergence.
 
+* Random method - how to generate new points:
+  * Use uniform distribution for random point generation throughout the search space.
+  * Consider target-focused distribution using techniques like importance or adaptive sampling.
 
+* Dubins - finding a closer solution when no optimal length exists:
+  * Relax constraints or introduce penalties in the optimization objective.
+  * Modify the cost function or introduce soft constraints.
+  * Employ heuristic methods like sampling-based algorithms or optimization techniques to find a feasible solution closer to the goal.
 
-  
-  
   
