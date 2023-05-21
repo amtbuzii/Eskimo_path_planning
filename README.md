@@ -93,7 +93,7 @@ determining the most efficient path on that graph.
         1. Union of polygons that share a common boundary. (**not convex** polygon)
         2. Connect all possible nodes in the field while also ensuring collision detection and avoidance.
 
-      ![img.png](project_data/naive.png)
+      ![img.png](project_data/Naive_ex.png)
   
       ## Greedy approach: select the shortest path to traverse the polygon.
         1. Union of polygons that share a common boundary. (inflation **convex** polygon)
@@ -110,7 +110,7 @@ determining the most efficient path on that graph.
                     - Recursive_algorithm(s_left)
                 - else:
                     - Recursive_algorithm(s_right)
-        ![img.png](project_data/naive.png)
+        ![img.png](project_data/greedy_ex..png)
 
       ## Optimal approach: generating a graph solely based on the relevant convex shapes.
         1. Union of polygons that share a common boundary. (inflation **convex** polygon)
@@ -124,9 +124,9 @@ determining the most efficient path on that graph.
                 - s_left, s_right = Identify two points on the new polygon that are positioned on opposite sides of the starting point.
                 - Recursive_algorithm(s_left)
                 - Recursive_algorithm(s_right)
-
-      **Example GIF**
-      ![img.png](project_data/example_gif.gif)
+    ![img.png](project_data/optimal_ex.png)
+  **Optimal approach GIF**
+  ![img.png](project_data/example_gif.gif)
 
       ## Random approach: generate a graph in a random manner. (RRT/RRT*)
       1. Union of polygons that share a common boundary. (**not convex** polygon)
@@ -173,7 +173,7 @@ determining the most efficient path on that graph.
 3. **Greedy** $\mu=418.64$, $\sigma=13.33$
 4. **Random** $\mu=589.17$, $\sigma=54.56$
 
-**Dubins** $\mu=648.77$, $\sigma=200.65$
+* **Dubins** $\mu=648.77$, $\sigma=200.65$
 
 ![img.png](project_data/lengths_c.png)
 
