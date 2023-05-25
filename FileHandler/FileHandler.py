@@ -124,9 +124,9 @@ def show_field(field_data: Field, convex: bool) -> None:
             points_y.append(points_y[0])
             plt.plot(points_x, points_y, linewidth=1)
 
-    plt.xlim(0, 300)
-    plt.ylim(0, 300)
+    plt.xlim(0, field_data.size)
+    plt.ylim(0, field_data.size)
 
     # grid configurations
     plt.legend(loc="upper center", bbox_to_anchor=(0.5, -0.05), ncol=5)
-    plt.show()
+    # plt.show()
