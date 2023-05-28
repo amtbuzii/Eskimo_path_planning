@@ -8,6 +8,7 @@ DEFAULT_SEED = 0
 DEFAULT_START = Point(0.0, 0.0)
 DEFAULT_END = Point(10.0, 10.0)
 FILE_PATH = "../Eskimo_path_planning/field_data.txt"
+FIELD_SIZE = 300
 
 # icebergs parameters
 MIN_ICEBERGS = 5
@@ -24,4 +25,4 @@ STEP_SIZE = 4
 # Dubins parameters
 DUBINS_VEL = 13  # constant velocity
 DUBINS_PHI = 45  # maximum allowable roll angle
-POLY_TOLERANCE = 5.0
+POLY_TOLERANCE = 5

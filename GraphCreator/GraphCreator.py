@@ -598,8 +598,8 @@ class GraphCreator:
                 new_points.pop(jj)
                 point_poly.pop(jj)
                 jj -= 1
-            if distance(new_points[jj], new_points[jj - 1]) < self._dubins_radius * 2:
-                new_points.pop(jj)
+            # if distance(new_points[jj], new_points[jj - 1]) < self._dubins_radius * 2:
+            #   new_points.pop(jj)
         return new_points
 
     def _get_point_polygon(self, point) -> int:

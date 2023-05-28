@@ -25,3 +25,4 @@ tomli==2.0.1
 tzdata==2023.3
 zipp==3.15.0
 pre-commit==2.9.2
+customtkinter~=5.1.3
