@@ -598,8 +598,8 @@ class GraphCreator:
                 new_points.pop(jj)
                 point_poly.pop(jj)
                 jj -= 1
-            if distance(new_points[jj], new_points[jj - 1]) < self._dubins_radius * 2:
-                new_points.pop(jj)
+            # if distance(new_points[jj], new_points[jj - 1]) < self._dubins_radius * 2:
+            #   new_points.pop(jj)
         return new_points
 
     def _get_point_polygon(self, point) -> int:
@@ -658,22 +658,22 @@ class GraphCreator:
         pos = {point: point for point in self._graph.nodes}
 
         # add axis
-        fig, ax = plt.subplots()
+        # fig, ax = plt.subplots()
         for i, p in enumerate(self._polygons):
             polygon1 = Polygon(p)
             x, y = polygon1.exterior.xy
             plt.plot(x, y, alpha=0.5)
 
         # figure title
-        fig.suptitle("Eskimo field", fontsize=15)
-        ax.set_title(self._graph_type)
+        plt.suptitle("Eskimo field", fontsize=15)
+        plt.title(self._graph_type)
 
         # draw nodes and edges
         if self._dubins_graph is None:
-            nx.draw(self._graph, pos=pos, node_size=1, ax=ax, style="-.")
+            nx.draw(self._graph, pos=pos, node_size=1, style="-.")
 
         # plot START + END point
-        ax.scatter(
+        plt.scatter(
             self._start[0],
             self._start[1],
             color="blue",
@@ -681,7 +681,7 @@ class GraphCreator:
             s=50,
             label="Start",
         )
-        ax.scatter(
+        plt.scatter(
             self._end[0],
             self._end[1],
             color="red",
@@ -689,8 +689,8 @@ class GraphCreator:
             s=50,
             label="End",
         )
-        plt.xlim(0, 300)
-        plt.ylim(0, 300)
+        plt.xlim(0, self._field.size)
+        plt.ylim(0, self._field.size)
 
         # Shortest path
         if self._short_path is not None:
@@ -705,7 +705,6 @@ class GraphCreator:
                 nodelist=path,
                 node_size=2,
                 node_color="r",
-                ax=ax,
             )
             nx.draw_networkx_edges(
                 self._graph,
@@ -714,7 +713,6 @@ class GraphCreator:
                 width=2,
                 alpha=0.3,
                 edge_color="r",
-                ax=ax,
             )
             # Adding text
             if self._dubins_graph is None:
@@ -730,7 +728,7 @@ class GraphCreator:
             pos = {point: point for point in self._dubins_graph.nodes}
             x = [point[0] for point in self._dubins_path]
             y = [point[1] for point in self._dubins_path]
-            ax.scatter(
+            plt.scatter(
                 x,
                 y,
                 color="red",
@@ -741,7 +739,6 @@ class GraphCreator:
                 self._dubins_graph,
                 pos=pos,
                 node_size=0.01,
-                ax=ax,
                 style="-.",
             )  # draw nodes and edges
 
@@ -752,13 +749,13 @@ class GraphCreator:
                 fontsize=10,
                 bbox=dict(facecolor="red", alpha=0.5),
             )
-            plt.xlim(-25, 325)
-            plt.ylim(-25, 325)
+            plt.xlim(-25, self._field.size + 25)
+            plt.ylim(-25, self._field.size + 25)
 
         # grid configurations
         plt.axis("on")
-        ax.tick_params(left=True, bottom=True, labelleft=True, labelbottom=True)
-        ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.05), ncol=5)
+        plt.tick_params(left=True, bottom=True, labelleft=True, labelbottom=True)
+        plt.legend(loc="upper center", bbox_to_anchor=(0.5, -0.05), ncol=5)
         # ax.grid()
         # if save: plt.savefig(f'./img/img_{t}.png', transparent=False,facecolor='white')
-        plt.show()
+        # plt.show()
