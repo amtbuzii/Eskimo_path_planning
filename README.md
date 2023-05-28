@@ -179,9 +179,9 @@ determining the most efficient path on that graph.
 ![img.png](project_data/lengths_c2.png)
 
 ## Runtime [s]: 
-1. **Naive** $\mu=0.0423$, $\sigma=0.008$
+1. **Greedy** $\mu=0.0423$, $\sigma=0.008$
 2. **Optimal** $\mu=0.085$, $\sigma=0.243$
-3. **Greedy** $\mu=3.513$, $\sigma=0.442$
+3. **Naive** $\mu=3.513$, $\sigma=0.442$
 4. **Random** $\mu=24.165$, $\sigma=4.52$
 
 * **Dubins** $\mu=0.374.77$, $\sigma=0.14$
