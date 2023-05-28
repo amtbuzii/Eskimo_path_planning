@@ -18,7 +18,7 @@ from constant import *
 
 
 logging.basicConfig(
-    filename="../test.log",
+    filename="test.log",
     level=logging.INFO,
     format="%(asctime)s:%(levelname)s:%(message)s",
 )
@@ -51,9 +51,7 @@ class App(customtkinter.CTk):
         self.sidebar_frame.grid(row=0, column=0, rowspan=4, sticky="nsew")
         self.sidebar_frame.grid_rowconfigure(6, weight=1)
 
-        image_path = os.path.join(
-            os.path.dirname(os.path.realpath(__file__)), "../icons"
-        )
+        image_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "icons")
         self.logo_image = customtkinter.CTkImage(
             Image.open(os.path.join(image_path, "eskimo.png")), size=(26, 26)
         )
@@ -330,9 +328,7 @@ class App(customtkinter.CTk):
         customtkinter.CTkLabel(dialog, text="Version: " + version).pack()
         customtkinter.CTkLabel(dialog, text="Name: " + name).pack()
         customtkinter.CTkLabel(dialog, text="Email: " + email).pack()
-        image_path = os.path.join(
-            os.path.dirname(os.path.realpath(__file__)), "../icons"
-        )
+        image_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "icons")
         logo_image = customtkinter.CTkImage(
             Image.open(os.path.join(image_path, "eskimo.png")), size=(200, 200)
         )
@@ -355,7 +351,7 @@ class App(customtkinter.CTk):
         ).pack()
 
     def read_log(self) -> None:
-        path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../test.log")
+        path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "test.log")
 
         # Read the contents of the log file
         with open(path, "r") as file:
