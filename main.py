@@ -1,5 +1,11 @@
-from Main import main_GUI
-from Main import main_no_GUI
+import main_GUI
+import logging
+
+logging.basicConfig(
+    filename="../test.log",
+    level=logging.INFO,
+    format="%(asctime)s:%(levelname)s:%(message)s",
+)
 
 
 if __name__ == "__main__":
