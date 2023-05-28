@@ -230,6 +230,14 @@ determining the most efficient path on that graph.
 ![img.png](project_data/per_5.png)
 ![img.png](project_data/per_6.png)
 
+## GUI
+* using [CustomTkinter](https://github.com/TomSchimansky/CustomTkinter) by Tom-Schimansky
+
+![img.png](project_data/eskimo_program.png)
+
+![img.png](project_data/program_1.png)
+
+
 ## TBD
 * Collision detection process improvements:
   * Use efficient data structures like octrees or BVHs.
